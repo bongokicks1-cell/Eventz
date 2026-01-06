@@ -5659,7 +5659,7 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
             eventsHosted: selectedUser.type === 'Organizer' ? 24 : undefined,
             eventsAttended: selectedUser.type === 'Attendee' ? 156 : undefined,
             avatar: selectedUser.avatar,
-            coverImage: selectedUser.name === 'Buki Jenard' ? bukiJenardCover : selectedUser.name === 'Luchy Ranks' ? luchyRanksCover : 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200',
+            coverImage: selectedUser.name === 'Buki Jenard' ? 'https://i.ibb.co/F2wGf9R/B-Cover.jpg' : selectedUser.name === 'Luchy Ranks' ? 'https://i.ibb.co/k2Jg34Nv/L-cover.jpg' : 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200',
             bio: selectedUser.type === 'Organizer' 
               ? 'Professional event organizer specializing in creating unforgettable experiences. Passionate about bringing people together through music, culture, and celebration.' 
               : selectedUser.type === 'Performer'
