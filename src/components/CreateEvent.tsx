@@ -114,10 +114,17 @@ export function CreateEvent({ onBack, event }: CreateEventProps) {
         return;
       }
 
-      // Create object URL for preview
-      const imageUrl = URL.createObjectURL(file);
-      handleInputChange('coverImage', imageUrl);
-      toast.success('Cover image uploaded! 📸');
+      // Convert to base64 for persistent storage
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        handleInputChange('coverImage', base64String);
+        toast.success('Cover image uploaded! 📸');
+      };
+      reader.onerror = () => {
+        toast.error('Failed to upload image');
+      };
+      reader.readAsDataURL(file);
     }
   };
 

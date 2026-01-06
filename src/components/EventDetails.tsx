@@ -151,7 +151,7 @@ const events: Event[] = [
     title: 'Electric Nights - Themed Party',
     category: 'Entertainment',
     subcategory: 'Nightlife',
-    image: hennessyPoster,
+    image: 'https://i.ibb.co/n8Rk2bBZ/Tyler-ICU.jpg',
     date: 'Friday, June 20, 2025',
     time: '10:00 PM - 4:00 AM',
     location: 'Elements Nightclub',
