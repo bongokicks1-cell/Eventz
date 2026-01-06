@@ -51,7 +51,7 @@ export function PremiumSearchModal({ onClose, events, onEventSelect, onPersonSel
       name: 'Buki Jenard', 
       type: 'Attendee', 
       followers: '2.8k', 
-      avatar: bukiJenardAvatar,
+      avatar: 'https://i.ibb.co/3GrDQfJ/B-Profile.jpg',
       verified: false,
       location: 'Dar es Salaam',
       aliases: ['Luchy Ranks'], // Alternative names
@@ -60,7 +60,7 @@ export function PremiumSearchModal({ onClose, events, onEventSelect, onPersonSel
       name: 'Luchy Ranks', 
       type: 'Attendee', 
       followers: '2.8k', 
-      avatar: luchyRanksAvatar,
+      avatar: 'https://i.ibb.co/NdFdCBzD/L-profile.jpg',
       verified: false,
       location: 'Dar es Salaam',
       aliases: ['Buki Jenard'], // Alternative names
