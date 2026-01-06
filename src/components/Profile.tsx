@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Settings, MapPin, Calendar, Video, Edit2, Bookmark, X, Sparkles, Play, Heart, Ticket, Bell, BellOff, Camera, Image as ImageIcon, Upload, Plus, Smile } from 'lucide-react';
-import profileImage from 'figma:asset/e4506bfed46f0f064df873e365dda9253debd675.png';
-import coverImage from 'figma:asset/283891e9f652cbe41a94230aea75c2e708307b7b.png';
 import { toast } from 'sonner@2.0.3';
 import { SettingsModal } from './SettingsModal';
 import { MediaViewer } from './MediaViewer';
@@ -478,7 +476,7 @@ export function Profile() {
         {/* Cover Photo */}
         <div className="relative w-full h-32 overflow-hidden">
           <img
-            src={coverImage}
+            src="https://i.ibb.co/HDY1fq6m/G-Cover.jpg"
             alt="Cover"
             className="w-full h-full object-cover"
           />
@@ -493,7 +491,7 @@ export function Profile() {
           <div className="flex justify-center mb-4">
             <div className="relative">
               <img
-                src={profileImage}
+                src="https://i.ibb.co/3559hRDP/G-Profile.jpg"
                 alt="Profile"
                 className="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover"
               />
