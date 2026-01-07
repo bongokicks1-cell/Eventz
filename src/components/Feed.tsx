@@ -275,6 +275,8 @@ export function Feed() {
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [likeAnimation, setLikeAnimation] = useState<{ show: boolean; x: number; y: number }>({ show: false, x: 0, y: 0 });
   const [lastTap, setLastTap] = useState<number>(0);
+  const [expandedPostId, setExpandedPostId] = useState<number | null>(null);
+  const [commentTexts, setCommentTexts] = useState<{ [key: number]: string }>({});
   
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -399,39 +401,32 @@ export function Feed() {
           return p;
         }));
       }
-    } else {
-      // Single tap - open post detail after a short delay
-      const timer = setTimeout(() => {
-        openPostDetail(post);
-      }, 300);
-      
-      // Store timer to clear it if double tap happens
-      (e.currentTarget as any).singleTapTimer = timer;
     }
     
     setLastTap(currentTime);
   };
 
-  const handleAddComment = () => {
-    if (!commentText.trim() || !selectedPost) return;
+  const toggleComments = (postId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setExpandedPostId(expandedPostId === postId ? null : postId);
+  };
+
+  const handlePostComment = (postId: number) => {
+    const text = commentTexts[postId];
+    if (!text || !text.trim()) return;
 
     const newComment: Comment = {
-      id: selectedPost.comments.length + 1,
+      id: Date.now(),
       user: {
         name: 'George Mukulasi',
         avatar: 'https://i.ibb.co/3559hRDP/G-Profile.jpg',
       },
-      text: commentText,
+      text: text.trim(),
       timestamp: 'Just now',
     };
 
-    setSelectedPost({
-      ...selectedPost,
-      comments: [...selectedPost.comments, newComment],
-    });
-
     setPosts(posts.map(post => {
-      if (post.id === selectedPost.id) {
+      if (post.id === postId) {
         return {
           ...post,
           comments: [...post.comments, newComment],
@@ -440,8 +435,8 @@ export function Feed() {
       return post;
     }));
 
-    setCommentText('');
-    toast.success('Comment posted!');
+    setCommentTexts({ ...commentTexts, [postId]: '' });
+    toast.success('Reply posted! 💬');
   };
 
   const filteredPosts = posts.filter(post => {
@@ -453,7 +448,7 @@ export function Feed() {
   return (
     <>
       {/* Main Feed View */}
-      <div className={`min-h-screen bg-gradient-to-b from-gray-50 to-white pb-20 ${selectedPost ? 'hidden' : 'block'}`}>
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-20">
         {/* Unique Header Design */}
         <div className="bg-white border-b border-gray-100">
           <div className="px-4 pt-5 pb-4">
@@ -628,7 +623,10 @@ export function Feed() {
                     <span className="text-sm font-semibold">{post.likes}</span>
                   </button>
 
-                  <button className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 hover:bg-purple-50 hover:text-[#8A2BE2] rounded-lg transition-all">
+                  <button
+                    onClick={(e) => toggleComments(post.id, e)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all bg-white text-gray-700 hover:bg-purple-50 hover:text-[#8A2BE2]`}
+                  >
                     <MessageCircle className="w-4 h-4" />
                     <span className="text-sm font-medium">{post.comments.length}</span>
                   </button>
@@ -646,6 +644,73 @@ export function Feed() {
                   </button>
                 </div>
               </div>
+
+              {/* Inline Comments Section - Slides Down */}
+              {expandedPostId === post.id && (
+                <div className="px-4 pb-4 space-y-4 animate-slideDown">
+                  {/* Add Comment Input */}
+                  <div className="flex gap-3 items-start">
+                    <img
+                      src="https://i.ibb.co/3559hRDP/G-Profile.jpg"
+                      alt="You"
+                      className="w-9 h-9 rounded-xl object-cover flex-shrink-0"
+                    />
+                    <div className="flex-1 flex gap-2">
+                      <textarea
+                        value={commentTexts[post.id] || ''}
+                        onChange={(e) => setCommentTexts({ ...commentTexts, [post.id]: e.target.value })}
+                        placeholder="Write a comment..."
+                        rows={1}
+                        className="flex-1 bg-gray-50 rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-400 outline-none border border-gray-200 focus:border-purple-300 focus:bg-white focus:ring-2 focus:ring-purple-100 resize-none transition-all"
+                      />
+                      <button
+                        onClick={() => handlePostComment(post.id)}
+                        disabled={!commentTexts[post.id]?.trim()}
+                        className={`p-3 rounded-xl transition-all flex-shrink-0 ${
+                          commentTexts[post.id]?.trim()
+                            ? 'bg-gradient-to-br from-[#6B21A8] via-[#7C2D9F] to-[#BE185D] hover:from-[#581C87] hover:to-[#9F1239] text-white shadow-lg shadow-purple-900/30'
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <MessageCircle className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Comments List */}
+                  {post.comments.length > 0 && (
+                    <div className="space-y-3 pt-2 border-t border-gray-100">
+                      {post.comments.map((comment) => (
+                        <div key={comment.id} className="flex gap-3">
+                          <img
+                            src={comment.user.avatar}
+                            alt={comment.user.name}
+                            className="w-8 h-8 rounded-lg object-cover flex-shrink-0"
+                          />
+                          <div className="flex-1">
+                            <div className="bg-gray-50 rounded-xl px-3 py-2.5">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-gray-900 text-sm font-semibold">{comment.user.name}</span>
+                                <span className="text-gray-400 text-xs">• {comment.timestamp}</span>
+                              </div>
+                              <p className="text-gray-700 text-sm leading-relaxed">{comment.text}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Empty State */}
+                  {post.comments.length === 0 && (
+                    <div className="text-center py-6">
+                      <p className="text-gray-400 text-sm">
+                        No replies yet. Be the first! 💬
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
 
@@ -848,17 +913,17 @@ export function Feed() {
                     />
                     <div className="flex-1">
                       <textarea
-                        value={commentText}
-                        onChange={(e) => setCommentText(e.target.value)}
+                        value={commentTexts[selectedPost.id] || ''}
+                        onChange={(e) => setCommentTexts({ ...commentTexts, [selectedPost.id]: e.target.value })}
                         placeholder="Share your thoughts..."
                         rows={3}
                         className="w-full bg-white rounded-xl px-4 py-3 text-sm text-gray-900 placeholder-gray-500 outline-none border border-gray-200 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 resize-none"
                       />
                       <button
-                        onClick={handleAddComment}
-                        disabled={!commentText.trim()}
+                        onClick={() => handlePostComment(selectedPost.id)}
+                        disabled={!commentTexts[selectedPost.id]?.trim()}
                         className={`mt-3 px-5 py-2.5 rounded-xl font-medium text-sm transition-all flex items-center gap-2 ${
-                          commentText.trim()
+                          commentTexts[selectedPost.id]?.trim()
                             ? 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white'
                             : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                         }`}
@@ -970,6 +1035,18 @@ export function Feed() {
             transform: translateY(0);
           }
         }
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            max-height: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            max-height: 1000px;
+            transform: translateY(0);
+          }
+        }
         @keyframes likePopup {
           0% {
             opacity: 0;
@@ -986,6 +1063,9 @@ export function Feed() {
         }
         .animate-likePopup {
           animation: likePopup 1s ease-out forwards;
+        }
+        .animate-slideDown {
+          animation: slideDown 0.3s ease-out forwards;
         }
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
