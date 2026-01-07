@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import { EventDetails } from './components/EventDetails';
 import { LiveFeed } from './components/LiveFeed';
+import { Feed } from './components/Feed';
 import { CreateEvent } from './components/CreateEvent';
 import { BecomeOrganizer } from './components/BecomeOrganizer';
 import { OrganizerProfileSetup } from './components/OrganizerProfileSetup';
 import { OrganizerDashboard } from './components/OrganizerDashboard';
 import { Notifications } from './components/Notifications';
 import { Profile } from './components/Profile';
-import { Calendar, Radio, PlusCircle, Bell, User } from 'lucide-react';
+import { Calendar, Radio, PlusCircle, Bell, User, Rss } from 'lucide-react';
 import { Toaster } from 'sonner@2.0.3';
 
-type Tab = 'event' | 'live' | 'create' | 'notifications' | 'profile';
+type Tab = 'event' | 'feed' | 'live' | 'create' | 'profile';
 type OrganizerView = 'dashboard' | 'createEvent';
 
 export interface PurchasedTicket {
@@ -95,6 +96,7 @@ export default function App() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto pb-20">
         {activeTab === 'event' && <EventDetails onTicketPurchase={handleTicketPurchase} purchasedTickets={purchasedTickets} />}
+        {activeTab === 'feed' && <Feed />}
         {activeTab === 'live' && <LiveFeed />}
         {activeTab === 'create' && (
           !isOrganizer ? (
@@ -107,7 +109,6 @@ export default function App() {
             <CreateEvent onBack={handleBackToDashboard} event={editingEvent} />
           )
         )}
-        {activeTab === 'notifications' && <Notifications purchasedTickets={purchasedTickets} />}
         {activeTab === 'profile' && <Profile />}
       </div>
 
@@ -123,6 +124,15 @@ export default function App() {
             >
               <Calendar className="w-6 h-6" />
               <span className="text-xs">Events</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('feed')}
+              className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
+                activeTab === 'feed' ? 'text-purple-600' : 'text-gray-500'
+              }`}
+            >
+              <Rss className="w-6 h-6" />
+              <span className="text-xs">Feed</span>
             </button>
             <button
               onClick={() => setActiveTab('live')}
@@ -143,16 +153,6 @@ export default function App() {
             >
               <PlusCircle className="w-6 h-6" />
               <span className="text-xs">Create</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('notifications')}
-              className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors relative ${
-                activeTab === 'notifications' ? 'text-purple-600' : 'text-gray-500'
-              }`}
-            >
-              <Bell className="w-6 h-6" />
-              <span className="text-xs">Alerts</span>
-              <span className="absolute top-1 right-2 w-2 h-2 bg-pink-500 rounded-full"></span>
             </button>
             <button
               onClick={() => setActiveTab('profile')}
