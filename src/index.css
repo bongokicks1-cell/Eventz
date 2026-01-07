@@ -2493,6 +2493,18 @@
     --tw-gradient-stops: var(--tw-gradient-via-stops);
   }
 
+  .via-purple-100\/50 {
+    --tw-gradient-via: color-mix(in srgb, oklch(.946 .033 307.174) 50%, transparent);
+    --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);
+    --tw-gradient-stops: var(--tw-gradient-via-stops);
+  }
+
+  @supports (color: color-mix(in lab, red, red)) {
+    .via-purple-100\/50 {
+      --tw-gradient-via: color-mix(in oklab, var(--color-purple-100) 50%, transparent);
+    }
+  }
+
   .via-purple-800 {
     --tw-gradient-via: var(--color-purple-800);
     --tw-gradient-via-stops: var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-via) var(--tw-gradient-via-position), var(--tw-gradient-to) var(--tw-gradient-to-position);

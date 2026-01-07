@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus, ThumbsUp } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 
 interface Comment {
@@ -273,6 +273,8 @@ export function Feed() {
   const [commentText, setCommentText] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [likeAnimation, setLikeAnimation] = useState<{ show: boolean; x: number; y: number }>({ show: false, x: 0, y: 0 });
+  const [lastTap, setLastTap] = useState<number>(0);
   
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -291,12 +293,25 @@ export function Feed() {
 
   const toggleLike = (postId: number, e?: React.MouseEvent) => {
     e?.stopPropagation();
+    
+    // Show thumbs up animation at click position
+    if (e && !posts.find(p => p.id === postId)?.isLiked) {
+      const rect = (e.target as HTMLElement).getBoundingClientRect();
+      setLikeAnimation({
+        show: true,
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      });
+      
+      // Hide animation after 1 second
+      setTimeout(() => {
+        setLikeAnimation({ show: false, x: 0, y: 0 });
+      }, 1000);
+    }
+    
     setPosts(posts.map(post => {
       if (post.id === postId) {
         const newIsLiked = !post.isLiked;
-        if (newIsLiked && !selectedPost) {
-          toast.success('Added to favorites! ⭐');
-        }
         return {
           ...post,
           isLiked: newIsLiked,
@@ -348,6 +363,53 @@ export function Feed() {
   const closePostDetail = () => {
     setSelectedPost(null);
     setCommentText('');
+  };
+
+  const handleDoubleTap = (post: Post, e: React.MouseEvent) => {
+    const currentTime = new Date().getTime();
+    const tapLength = currentTime - lastTap;
+    
+    if (tapLength < 300 && tapLength > 0) {
+      // Double tap detected!
+      e.stopPropagation();
+      
+      // Only like if not already liked
+      if (!post.isLiked) {
+        // Show animation at tap position
+        setLikeAnimation({
+          show: true,
+          x: e.clientX,
+          y: e.clientY,
+        });
+        
+        // Hide animation after 1 second
+        setTimeout(() => {
+          setLikeAnimation({ show: false, x: 0, y: 0 });
+        }, 1000);
+        
+        // Update the post to liked state
+        setPosts(posts.map(p => {
+          if (p.id === post.id) {
+            return {
+              ...p,
+              isLiked: true,
+              likes: p.likes + 1,
+            };
+          }
+          return p;
+        }));
+      }
+    } else {
+      // Single tap - open post detail after a short delay
+      const timer = setTimeout(() => {
+        openPostDetail(post);
+      }, 300);
+      
+      // Store timer to clear it if double tap happens
+      (e.currentTarget as any).singleTapTimer = timer;
+    }
+    
+    setLastTap(currentTime);
   };
 
   const handleAddComment = () => {
@@ -475,7 +537,7 @@ export function Feed() {
             <div
               key={post.id}
               className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-purple-200 transition-all cursor-pointer"
-              onClick={() => openPostDetail(post)}
+              onClick={(e) => handleDoubleTap(post, e)}
               style={{ animation: `slideUp 0.4s ease-out ${index * 0.08}s both` }}
             >
               {/* Unique Header with Actions on Right */}
@@ -512,8 +574,8 @@ export function Feed() {
                     </div>
                   </div>
 
-                  {/* Unique Action Buttons - Vertical Stack on Right */}
-                  <div className="flex flex-col gap-2 items-center">
+                  {/* Unique Action Buttons - Only Save on Right */}
+                  <div className="flex items-center">
                     <button
                       onClick={(e) => toggleSave(post.id, e)}
                       className={`p-2 rounded-lg transition-all ${
@@ -524,13 +586,6 @@ export function Feed() {
                       title="Save"
                     >
                       <Bookmark className={`w-4 h-4 ${post.isSaved ? 'fill-purple-600' : ''}`} />
-                    </button>
-                    <button
-                      onClick={(e) => sharePost(post, e)}
-                      className="p-2 bg-gray-50 text-gray-600 hover:bg-cyan-50 hover:text-cyan-600 rounded-lg transition-all"
-                      title="Share"
-                    >
-                      <Share2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>
@@ -558,29 +613,36 @@ export function Feed() {
                 </div>
               )}
 
-              {/* Engagement Bar - Unique Horizontal Design */}
+              {/* Engagement Bar - Revolutionary Purple Design */}
               <div className="px-4 pb-4">
-                <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-purple-50/30 rounded-xl px-4 py-3">
+                <div className="flex items-center justify-between bg-gradient-to-r from-purple-50 via-purple-100/50 to-purple-50 rounded-xl px-4 py-3 border border-purple-100">
                   <button
                     onClick={(e) => toggleLike(post.id, e)}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
                       post.isLiked
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-white text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                        ? 'bg-[#8A2BE2] text-white shadow-md'
+                        : 'bg-white text-gray-700 hover:bg-purple-50 hover:text-[#8A2BE2]'
                     }`}
                   >
-                    <Star className={`w-4 h-4 ${post.isLiked ? 'fill-white' : ''}`} />
-                    <span className="text-sm font-medium">{post.likes}</span>
+                    <ThumbsUp className={`w-4 h-4 ${post.isLiked ? 'fill-white' : ''}`} />
+                    <span className="text-sm font-semibold">{post.likes}</span>
                   </button>
 
-                  <button className="flex items-center gap-2 px-3 py-1.5 bg-white text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 rounded-lg transition-all">
+                  <button className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 hover:bg-purple-50 hover:text-[#8A2BE2] rounded-lg transition-all">
                     <MessageCircle className="w-4 h-4" />
-                    <span className="text-sm font-medium">{post.comments.length} Replies</span>
+                    <span className="text-sm font-medium">{post.comments.length}</span>
                   </button>
 
-                  <button className="flex items-center gap-1.5 text-gray-500 hover:text-purple-600 transition-colors">
+                  <button className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 hover:bg-purple-50 hover:text-[#8A2BE2] rounded-lg transition-all">
                     <Eye className="w-4 h-4" />
-                    <span className="text-xs font-medium">{post.shares}</span>
+                    <span className="text-sm font-medium">{post.shares}</span>
+                  </button>
+
+                  <button
+                    onClick={(e) => sharePost(post, e)}
+                    className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 hover:bg-cyan-50 hover:text-cyan-600 rounded-lg transition-all"
+                  >
+                    <Share2 className="w-4 h-4" />
                   </button>
                 </div>
               </div>
@@ -879,6 +941,24 @@ export function Feed() {
         </div>
       )}
 
+      {/* Professional Thumbs Up Animation */}
+      {likeAnimation.show && (
+        <div
+          className="fixed pointer-events-none z-[100]"
+          style={{
+            left: `${likeAnimation.x}px`,
+            top: `${likeAnimation.y}px`,
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          <div className="animate-likePopup">
+            <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-full p-4 shadow-2xl">
+              <ThumbsUp className="w-10 h-10 text-white fill-white" />
+            </div>
+          </div>
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes slideUp {
           from {
@@ -889,6 +969,23 @@ export function Feed() {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        @keyframes likePopup {
+          0% {
+            opacity: 0;
+            transform: scale(0.3) translateY(0) rotate(-10deg);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.2) translateY(-20px) rotate(10deg);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0.8) translateY(-60px) rotate(0deg);
+          }
+        }
+        .animate-likePopup {
+          animation: likePopup 1s ease-out forwards;
         }
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
