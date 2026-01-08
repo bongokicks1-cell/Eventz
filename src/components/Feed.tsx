@@ -1510,11 +1510,11 @@ export function Feed() {
               muted
               playsInline
               loop
+              preload="auto"
               className="w-full h-full object-contain"
-              poster={playingVideo.clips[playingVideo.clipIndex].thumbnail}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
-              onLoadedData={(e) => {
+              onCanPlay={(e) => {
                 const video = e.currentTarget;
                 video.play().catch(() => {
                   // Autoplay failed, user will need to tap to play
