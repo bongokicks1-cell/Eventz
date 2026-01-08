@@ -438,7 +438,8 @@ export function Feed() {
   const [expandedPostId, setExpandedPostId] = useState<number | null>(null);
   const [commentTexts, setCommentTexts] = useState<{ [key: number]: string }>({});
   const [playingVideo, setPlayingVideo] = useState<{ postId: number; clipIndex: number; clips: HighlightClip[] } | null>(null);
-  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
+  const [fullScreenImage, setFullScreenImage] = useState<{ images: string[]; currentIndex: number; postId: number } | null>(null);
+  const [fullScreenTouchStart, setFullScreenTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [carouselIndexes, setCarouselIndexes] = useState<{ [key: number]: number }>({});
   const [isPlaying, setIsPlaying] = useState(true);
   const [showControls, setShowControls] = useState(true);
@@ -446,7 +447,6 @@ export function Feed() {
   const [rewindAnimation, setRewindAnimation] = useState<{ show: boolean; direction: 'left' | 'right' } | null>(null);
   const [videoTouchStart, setVideoTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [imageTouchStart, setImageTouchStart] = useState<{ x: number; y: number } | null>(null);
-  const [activeClipIndex, setActiveClipIndex] = useState<{ [key: number]: number }>({});
   
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -765,111 +765,64 @@ export function Feed() {
                 </div>
               )}
 
-              {/* EVENT HIGHLIGHTS - SINGLE VERTICAL CARD WITH CAROUSEL (only for highlight posts) */}
+              {/* EVENT HIGHLIGHTS - SINGLE VERTICAL VIDEO (only for highlight posts) */}
               {post.isHighlight && post.highlights && post.highlights.length > 0 && (
                 <div className="px-4 pb-4">
                   {/* Single Vertical Highlight Card */}
                   <div className="relative">
-                    {/* Horizontal Scrollable Carousel */}
-                    <div 
-                      className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
-                      onScroll={(e) => {
-                        const container = e.currentTarget;
-                        const scrollLeft = container.scrollLeft;
-                        const itemWidth = container.offsetWidth;
-                        const currentIndex = Math.round(scrollLeft / itemWidth);
-                        setActiveClipIndex({ ...activeClipIndex, [post.id]: currentIndex });
+                    <div
+                      className="relative cursor-pointer group"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setPlayingVideo({ postId: post.id, clipIndex: 0, clips: post.highlights! });
                       }}
                     >
-                      {post.highlights.map((clip, idx) => (
-                        <div
-                          key={clip.id}
-                          className="flex-shrink-0 w-full snap-center"
-                        >
-                          <div
-                            className="relative cursor-pointer group"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setPlayingVideo({ postId: post.id, clipIndex: idx, clips: post.highlights! });
-                            }}
-                          >
-                            {/* Vertical Highlight Card - Premium Style */}
-                            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] bg-gradient-to-br from-purple-100 to-pink-100 shadow-lg">
-                              {/* Highlight Thumbnail */}
-                              <ImageWithFallback
-                                src={clip.thumbnail}
-                                alt={clip.title}
-                                className="w-full h-full object-cover"
-                              />
-                              
-                              {/* Cinematic Gradient Overlay */}
-                              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80"></div>
-                              
-                              {/* EVENTZ Signature Border */}
-                              <div className="absolute inset-0 rounded-2xl ring-2 ring-purple-500/30 group-hover:ring-purple-500/60 transition-all"></div>
-                              
-                              {/* Play Button - Center */}
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-12 h-12 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-300">
-                                  <Play className="w-5 h-5 text-[#8A2BE2] fill-[#8A2BE2] ml-0.5" />
-                                </div>
-                              </div>
-                              
-                              {/* Duration Badge - Top Right */}
-                              <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/90 backdrop-blur-md rounded-lg border border-white/10">
-                                <span className="text-white text-xs font-bold">{clip.duration}</span>
-                              </div>
-                              
-                              {/* Clip Index Badge - Top Left */}
-                              <div className="absolute top-3 left-3 px-2.5 py-1 bg-[#8A2BE2] backdrop-blur-md rounded-lg shadow-lg">
-                                <span className="text-white text-xs font-bold">{idx + 1}/{post.highlights.length}</span>
-                              </div>
-                              
-                              {/* Clip Info - Bottom Overlay */}
-                              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
-                                <h4 className="text-white font-bold text-base mb-1.5 line-clamp-2 leading-tight">
-                                  {clip.title}
-                                </h4>
-                                <div className="flex items-center gap-2">
-                                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full">
-                                    <Eye className="w-3.5 h-3.5 text-white" />
-                                    <span className="text-white text-xs font-bold">
-                                      {clip.views >= 1000 
-                                        ? `${(clip.views / 1000).toFixed(1)}K` 
-                                        : clip.views} views
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
+                      {/* Vertical Highlight Card - Premium Style */}
+                      <div className="relative rounded-2xl overflow-hidden aspect-[4/5] bg-gradient-to-br from-purple-100 to-pink-100 shadow-lg">
+                        {/* Highlight Thumbnail */}
+                        <ImageWithFallback
+                          src={post.highlights[0].thumbnail}
+                          alt={post.highlights[0].title}
+                          className="w-full h-full object-cover"
+                        />
+                        
+                        {/* Cinematic Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80"></div>
+                        
+                        {/* EVENTZ Signature Border */}
+                        <div className="absolute inset-0 rounded-2xl ring-2 ring-purple-500/30 group-hover:ring-purple-500/60 transition-all"></div>
+                        
+                        {/* Play Button - Center */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-12 h-12 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-300">
+                            <Play className="w-5 h-5 text-[#8A2BE2] fill-[#8A2BE2] ml-0.5" />
+                          </div>
+                        </div>
+                        
+                        {/* Duration Badge - Top Right */}
+                        <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/90 backdrop-blur-md rounded-lg border border-white/10">
+                          <span className="text-white text-xs font-bold">{post.highlights[0].duration}</span>
+                        </div>
+                        
+                        {/* Clip Info - Bottom Overlay */}
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
+                          <h4 className="text-white font-bold text-base mb-1.5 line-clamp-2 leading-tight">
+                            {post.highlights[0].title}
+                          </h4>
+                          <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full">
+                              <Eye className="w-3.5 h-3.5 text-white" />
+                              <span className="text-white text-xs font-bold">
+                                {post.highlights[0].views >= 1000 
+                                  ? `${(post.highlights[0].views / 1000).toFixed(1)}K` 
+                                  : post.highlights[0].views} views
+                              </span>
                             </div>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                    
-                    {/* Carousel Dots Indicator */}
-                    {post.highlights.length > 1 && (
-                      <div className="flex items-center justify-center gap-1.5 mt-3">
-                        {post.highlights.map((_, idx) => (
-                          <div
-                            key={idx}
-                            className="h-1.5 rounded-full bg-purple-200 transition-all duration-300 ease-out"
-                            style={{ width: idx === (activeClipIndex[post.id] || 0) ? '24px' : '8px' }}
-                          ></div>
-                        ))}
                       </div>
-                    )}
-                  </div>
-                  
-                  {/* Total Highlight Views - Minimalist Badge */}
-                  {post.totalHighlightViews && (
-                    <div className="mt-3 flex items-center justify-center gap-2 text-gray-500 text-xs">
-                      <Video className="w-3.5 h-3.5" />
-                      <span className="font-medium">
-                        {post.totalHighlightViews.toLocaleString()} total views
-                      </span>
                     </div>
-                  )}
+                  </div>
                 </div>
               )}
 
@@ -878,7 +831,7 @@ export function Feed() {
                 <div className="px-4 pb-4">
                   <div 
                     className="relative rounded-xl overflow-hidden cursor-pointer"
-                    onClick={() => setFullScreenImage(post.content.image!)}
+                    onClick={() => setFullScreenImage({ images: [post.content.image!], currentIndex: 0, postId: post.id })}
                   >
                     <ImageWithFallback
                       src={post.content.image}
@@ -924,7 +877,11 @@ export function Feed() {
                             });
                           }
                         } else if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
-                          setFullScreenImage(post.content.images![carouselIndexes[post.id] || 0]);
+                          setFullScreenImage({ 
+                            images: post.content.images!, 
+                            currentIndex: carouselIndexes[post.id] || 0,
+                            postId: post.id 
+                          });
                         }
                         
                         setImageTouchStart(null);
@@ -932,7 +889,11 @@ export function Feed() {
                       onClick={(e) => {
                         e.stopPropagation();
                         if (!('ontouchstart' in window)) {
-                          setFullScreenImage(post.content.images![carouselIndexes[post.id] || 0]);
+                          setFullScreenImage({ 
+                            images: post.content.images!, 
+                            currentIndex: carouselIndexes[post.id] || 0,
+                            postId: post.id 
+                          });
                         }
                       }}
                     >
@@ -1421,21 +1382,6 @@ export function Feed() {
       {/* Full-Screen Video Player - Instagram/Snapchat/YouTube Shorts Style */}
       {playingVideo && (
         <div className="fixed inset-0 bg-black z-[60]">
-          {/* Progress Bars - Top (Instagram Stories Style) */}
-          {playingVideo.clips.length > 1 && (
-            <div className="absolute top-2 left-0 right-0 z-20 px-2 flex gap-1">
-              {playingVideo.clips.map((_, idx) => (
-                <div key={idx} className="flex-1 h-0.5 bg-white/30 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full bg-white rounded-full transition-all duration-300 ease-out ${
-                      idx === playingVideo.clipIndex ? 'w-full' : idx < playingVideo.clipIndex ? 'w-full' : 'w-0'
-                    }`}
-                  ></div>
-                </div>
-              ))}
-            </div>
-          )}
-
           {/* Top Controls - Minimal */}
           <div className={`absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 to-transparent px-4 pt-12 pb-6 transition-opacity ${
             showControls ? 'opacity-100' : 'opacity-0'
@@ -1451,11 +1397,6 @@ export function Feed() {
               >
                 <X className="w-6 h-6 text-white" />
               </button>
-              <div className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">
-                <span className="text-white text-xs font-bold">
-                  {playingVideo.clipIndex + 1}/{playingVideo.clips.length}
-                </span>
-              </div>
             </div>
           </div>
 
@@ -1706,24 +1647,120 @@ export function Feed() {
         }
       `}} />
 
-      {/* Full-Screen Image Modal */}
+      {/* Full-Screen Image Modal with Swipe */}
       {fullScreenImage && (
         <div 
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
           onClick={() => setFullScreenImage(null)}
         >
           <button
-            className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+            className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-20"
             onClick={() => setFullScreenImage(null)}
           >
             <X className="w-6 h-6 text-white" />
           </button>
-          <img
-            src={fullScreenImage}
-            alt="Full size"
-            className="max-w-full max-h-full object-contain"
+          
+          {/* Image Counter for Multiple Images */}
+          {fullScreenImage.images.length > 1 && (
+            <div className="absolute top-6 left-6 bg-[#8A2BE2]/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium z-20">
+              {fullScreenImage.currentIndex + 1} / {fullScreenImage.images.length}
+            </div>
+          )}
+
+          <div 
+            className="relative w-full h-full flex items-center justify-center px-4 select-none"
+            onTouchStart={(e) => {
+              const touch = e.touches[0];
+              setFullScreenTouchStart({ x: touch.clientX, y: touch.clientY });
+            }}
+            onTouchEnd={(e) => {
+              if (!fullScreenTouchStart) return;
+              
+              const touch = e.changedTouches[0];
+              const deltaX = touch.clientX - fullScreenTouchStart.x;
+              const deltaY = touch.clientY - fullScreenTouchStart.y;
+              
+              // Only process horizontal swipes
+              if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                if (deltaX > 0 && fullScreenImage.currentIndex > 0) {
+                  // Swipe right - previous image
+                  setFullScreenImage({
+                    ...fullScreenImage,
+                    currentIndex: fullScreenImage.currentIndex - 1
+                  });
+                } else if (deltaX < 0 && fullScreenImage.currentIndex < fullScreenImage.images.length - 1) {
+                  // Swipe left - next image
+                  setFullScreenImage({
+                    ...fullScreenImage,
+                    currentIndex: fullScreenImage.currentIndex + 1
+                  });
+                }
+              }
+              
+              setFullScreenTouchStart(null);
+            }}
             onClick={(e) => e.stopPropagation()}
-          />
+          >
+            <img
+              src={fullScreenImage.images[fullScreenImage.currentIndex]}
+              alt="Full size"
+              className="max-w-full max-h-full object-contain pointer-events-none"
+            />
+            
+            {/* Navigation Arrows for Desktop */}
+            {fullScreenImage.images.length > 1 && (
+              <>
+                {fullScreenImage.currentIndex > 0 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFullScreenImage({
+                        ...fullScreenImage,
+                        currentIndex: fullScreenImage.currentIndex - 1
+                      });
+                    }}
+                    className="absolute left-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center text-white transition-all z-10"
+                  >
+                    <ChevronLeft className="w-7 h-7" />
+                  </button>
+                )}
+                
+                {fullScreenImage.currentIndex < fullScreenImage.images.length - 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFullScreenImage({
+                        ...fullScreenImage,
+                        currentIndex: fullScreenImage.currentIndex + 1
+                      });
+                    }}
+                    className="absolute right-6 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-sm flex items-center justify-center text-white transition-all z-10"
+                  >
+                    <ChevronRight className="w-7 h-7" />
+                  </button>
+                )}
+              </>
+            )}
+          </div>
+
+          {/* Dot Indicators for Multiple Images */}
+          {fullScreenImage.images.length > 1 && (
+            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+              {fullScreenImage.images.map((_, index) => (
+                <div
+                  key={index}
+                  className={`transition-all duration-300 rounded-full ${
+                    index === fullScreenImage.currentIndex
+                      ? 'w-8 h-2 bg-white'
+                      : 'w-2 h-2 bg-white/40'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
       )}
     </>
