@@ -943,7 +943,7 @@ export function Feed() {
                       />
                       
                       {/* Image Counter Badge */}
-                      <div className="absolute top-3 right-3 bg-[#8A2BE2]/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-medium pointer-events-none">
+                      <div className="absolute top-3 left-3 bg-[#8A2BE2]/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-medium pointer-events-none">
                         {(carouselIndexes[post.id] || 0) + 1} / {post.content.images.length}
                       </div>
                     </div>
