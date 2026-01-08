@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus, ThumbsUp, Play, Video, Flame, Zap } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus, ThumbsUp, Play, Video, Flame, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 
 interface Comment {
@@ -42,6 +42,7 @@ interface Post {
   content: {
     text?: string;
     image?: string;
+    images?: string[]; // For carousel posts with multiple images
     hashtags?: string[];
   };
   timestamp: string;
@@ -137,6 +138,32 @@ const mockPosts: Post[] = [
     isLiked: false,
     isSaved: false,
     recommended: true,
+  },
+  {
+    id: 9,
+    user: {
+      name: 'Marcus Thompson',
+      username: '@marcusthompson',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
+      verified: false,
+      isOrganizer: false,
+    },
+    content: {
+      text: 'What an incredible weekend at the Music & Arts Festival! 🎨🎵 Here are my favorite moments from the event. Swipe to see all the vibes! ✨',
+      images: [
+        'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800&h=600&fit=crop',
+        'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=800&h=600&fit=crop',
+      ],
+      hashtags: ['#MusicFestival', '#ArtsCulture', '#WeekendVibes'],
+    },
+    timestamp: '4h',
+    likes: 328,
+    comments: [],
+    shares: 45,
+    isLiked: true,
+    isSaved: false,
   },
   {
     id: 7,
@@ -411,11 +438,14 @@ export function Feed() {
   const [expandedPostId, setExpandedPostId] = useState<number | null>(null);
   const [commentTexts, setCommentTexts] = useState<{ [key: number]: string }>({});
   const [playingVideo, setPlayingVideo] = useState<{ postId: number; clipIndex: number; clips: HighlightClip[] } | null>(null);
+  const [fullScreenImage, setFullScreenImage] = useState<string | null>(null);
+  const [carouselIndexes, setCarouselIndexes] = useState<{ [key: number]: number }>({});
   const [isPlaying, setIsPlaying] = useState(true);
   const [showControls, setShowControls] = useState(true);
   const [lastVideoTap, setLastVideoTap] = useState<number>(0);
   const [rewindAnimation, setRewindAnimation] = useState<{ show: boolean; direction: 'left' | 'right' } | null>(null);
-  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [videoTouchStart, setVideoTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [imageTouchStart, setImageTouchStart] = useState<{ x: number; y: number } | null>(null);
   const [activeClipIndex, setActiveClipIndex] = useState<{ [key: number]: number }>({});
   
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -780,8 +810,8 @@ export function Feed() {
                               
                               {/* Play Button - Center */}
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-16 h-16 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-300">
-                                  <Play className="w-8 h-8 text-[#8A2BE2] fill-[#8A2BE2] ml-0.5" />
+                                <div className="w-12 h-12 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-300">
+                                  <Play className="w-5 h-5 text-[#8A2BE2] fill-[#8A2BE2] ml-0.5" />
                                 </div>
                               </div>
                               
@@ -846,12 +876,128 @@ export function Feed() {
               {/* Image - Rounded Inside Card (only for non-highlight posts) */}
               {post.content.image && !post.isHighlight && (
                 <div className="px-4 pb-4">
-                  <div className="relative rounded-xl overflow-hidden">
+                  <div 
+                    className="relative rounded-xl overflow-hidden cursor-pointer"
+                    onClick={() => setFullScreenImage(post.content.image!)}
+                  >
                     <ImageWithFallback
                       src={post.content.image}
                       alt="Post"
                       className="w-full aspect-[16/10] object-cover"
                     />
+                  </div>
+                </div>
+              )}
+
+              {/* Image Carousel - Multiple Images */}
+              {post.content.images && post.content.images.length > 0 && !post.isHighlight && (
+                <div className="px-4 pb-4">
+                  <div className="relative rounded-xl overflow-hidden group">
+                    {/* Current Image with Touch Handling */}
+                    <div 
+                      className="relative select-none"
+                      onTouchStart={(e) => {
+                        const touch = e.touches[0];
+                        setImageTouchStart({ x: touch.clientX, y: touch.clientY });
+                      }}
+                      onTouchEnd={(e) => {
+                        if (!imageTouchStart) return;
+                        
+                        const touch = e.changedTouches[0];
+                        const deltaX = touch.clientX - imageTouchStart.x;
+                        const deltaY = touch.clientY - imageTouchStart.y;
+                        
+                        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const currentIndex = carouselIndexes[post.id] || 0;
+                          
+                          if (deltaX > 0 && currentIndex > 0) {
+                            setCarouselIndexes({
+                              ...carouselIndexes,
+                              [post.id]: currentIndex - 1
+                            });
+                          } else if (deltaX < 0 && currentIndex < post.content.images!.length - 1) {
+                            setCarouselIndexes({
+                              ...carouselIndexes,
+                              [post.id]: currentIndex + 1
+                            });
+                          }
+                        } else if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
+                          setFullScreenImage(post.content.images![carouselIndexes[post.id] || 0]);
+                        }
+                        
+                        setImageTouchStart(null);
+                      }}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (!('ontouchstart' in window)) {
+                          setFullScreenImage(post.content.images![carouselIndexes[post.id] || 0]);
+                        }
+                      }}
+                    >
+                      <ImageWithFallback
+                        src={post.content.images[carouselIndexes[post.id] || 0]}
+                        alt={`Post image ${(carouselIndexes[post.id] || 0) + 1}`}
+                        className="w-full aspect-[16/10] object-cover pointer-events-none"
+                      />
+                      
+                      {/* Image Counter Badge */}
+                      <div className="absolute top-3 right-3 bg-[#8A2BE2]/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-full text-xs font-medium pointer-events-none">
+                        {(carouselIndexes[post.id] || 0) + 1} / {post.content.images.length}
+                      </div>
+                    </div>
+
+                    {/* Navigation Arrows - Desktop Only */}
+                    {post.content.images.length > 1 && (
+                      <>
+                        {(carouselIndexes[post.id] || 0) > 0 && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCarouselIndexes({
+                                ...carouselIndexes,
+                                [post.id]: (carouselIndexes[post.id] || 0) - 1
+                              });
+                            }}
+                            className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          >
+                            <ChevronLeft className="w-5 h-5" />
+                          </button>
+                        )}
+                        
+                        {(carouselIndexes[post.id] || 0) < post.content.images.length - 1 && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setCarouselIndexes({
+                                ...carouselIndexes,
+                                [post.id]: (carouselIndexes[post.id] || 0) + 1
+                              });
+                            }}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                          >
+                            <ChevronRight className="w-5 h-5" />
+                          </button>
+                        )}
+                      </>
+                    )}
+
+                    {/* Dot Indicators */}
+                    {post.content.images.length > 1 && (
+                      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none z-20">
+                        {post.content.images.map((_, index) => (
+                          <div
+                            key={index}
+                            className={`transition-all duration-300 rounded-full ${
+                              index === (carouselIndexes[post.id] || 0)
+                                ? 'w-6 h-1.5 bg-white'
+                                : 'w-1.5 h-1.5 bg-white/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -1318,14 +1464,14 @@ export function Feed() {
             className="relative w-full h-full flex items-center justify-center"
             onTouchStart={(e) => {
               const touch = e.touches[0];
-              setTouchStart({ x: touch.clientX, y: touch.clientY });
+              setVideoTouchStart({ x: touch.clientX, y: touch.clientY });
             }}
             onTouchEnd={(e) => {
-              if (!touchStart) return;
+              if (!videoTouchStart) return;
               
               const touch = e.changedTouches[0];
-              const deltaX = touch.clientX - touchStart.x;
-              const deltaY = touch.clientY - touchStart.y;
+              const deltaX = touch.clientX - videoTouchStart.x;
+              const deltaY = touch.clientY - videoTouchStart.y;
               
               // Check if it's a horizontal swipe (more horizontal than vertical)
               if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
@@ -1346,7 +1492,7 @@ export function Feed() {
                 }
               }
               
-              setTouchStart(null);
+              setVideoTouchStart(null);
             }}
             onClick={(e) => {
               const currentTime = new Date().getTime();
@@ -1559,6 +1705,27 @@ export function Feed() {
           scrollbar-width: none;
         }
       `}} />
+
+      {/* Full-Screen Image Modal */}
+      {fullScreenImage && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+          onClick={() => setFullScreenImage(null)}
+        >
+          <button
+            className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+            onClick={() => setFullScreenImage(null)}
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+          <img
+            src={fullScreenImage}
+            alt="Full size"
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </>
   );
 }
