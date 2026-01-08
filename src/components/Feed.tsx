@@ -1507,12 +1507,19 @@ export function Feed() {
             <video
               id="highlight-video"
               autoPlay
+              muted
               playsInline
               loop
               className="w-full h-full object-contain"
               poster={playingVideo.clips[playingVideo.clipIndex].thumbnail}
               onPlay={() => setIsPlaying(true)}
               onPause={() => setIsPlaying(false)}
+              onLoadedData={(e) => {
+                const video = e.currentTarget;
+                video.play().catch(() => {
+                  // Autoplay failed, user will need to tap to play
+                });
+              }}
             >
               <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
             </video>
