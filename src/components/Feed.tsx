@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus, ThumbsUp } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus, ThumbsUp, Play, Video, Flame, Zap } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 
 interface Comment {
@@ -11,6 +11,14 @@ interface Comment {
   };
   text: string;
   timestamp: string;
+}
+
+interface HighlightClip {
+  id: number;
+  thumbnail: string;
+  duration: string;
+  title: string;
+  views: number;
 }
 
 interface Post {
@@ -44,6 +52,9 @@ interface Post {
   isLiked: boolean;
   isSaved: boolean;
   recommended?: boolean;
+  isHighlight?: boolean;
+  highlights?: HighlightClip[];
+  totalHighlightViews?: number;
 }
 
 interface Notification {
@@ -126,6 +137,74 @@ const mockPosts: Post[] = [
     isLiked: false,
     isSaved: false,
     recommended: true,
+  },
+  {
+    id: 7,
+    user: {
+      name: 'EVENTZ Official',
+      username: '@eventz',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+      verified: true,
+      isOrganizer: true,
+    },
+    event: {
+      id: 7,
+      name: 'Afrobeat Live 2026',
+      date: 'Jan 10, 2026',
+      location: 'Diamond Platnumz Arena, DSM',
+      image: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800&h=600&fit=crop',
+      price: 'TZS 50,000',
+    },
+    content: {
+      text: '🔥 Relive the BEST moments from Afrobeat Live! Watch epic performances, backstage access, and crowd reactions. 5 exclusive clips from last night!',
+      hashtags: ['#AfrobeatLive', '#EventHighlights'],
+    },
+    timestamp: '3h',
+    likes: 892,
+    comments: [],
+    shares: 156,
+    views: 15420,
+    isLiked: false,
+    isSaved: false,
+    isHighlight: true,
+    totalHighlightViews: 15420,
+    highlights: [
+      {
+        id: 1,
+        thumbnail: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=600&fit=crop',
+        duration: '0:45',
+        title: 'Opening Performance',
+        views: 4230,
+      },
+      {
+        id: 2,
+        thumbnail: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=600&fit=crop',
+        duration: '1:12',
+        title: 'Crowd Goes Wild',
+        views: 5890,
+      },
+      {
+        id: 3,
+        thumbnail: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=400&h=600&fit=crop',
+        duration: '0:38',
+        title: 'Backstage Access',
+        views: 2150,
+      },
+      {
+        id: 4,
+        thumbnail: 'https://images.unsplash.com/photo-1429962714451-bb934ecdc4ec?w=400&h=600&fit=crop',
+        duration: '1:05',
+        title: 'Epic DJ Set',
+        views: 3890,
+      },
+      {
+        id: 5,
+        thumbnail: 'https://images.unsplash.com/photo-1506157786151-b8491531f063?w=400&h=600&fit=crop',
+        duration: '0:52',
+        title: 'Finale Fireworks',
+        views: 6340,
+      },
+    ],
   },
   {
     id: 2,
@@ -242,6 +321,60 @@ const mockPosts: Post[] = [
     recommended: true,
   },
   {
+    id: 8,
+    user: {
+      name: 'Events Team',
+      username: '@eventsteam',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400',
+      verified: true,
+      isOrganizer: true,
+    },
+    event: {
+      id: 8,
+      name: 'Jazz Night Downtown',
+      date: 'Jan 6, 2026',
+      location: 'Downtown Jazz Club, DSM',
+      image: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=800&h=600&fit=crop',
+      price: 'TZS 25,000',
+    },
+    content: {
+      text: '.sax Jazz Night was MAGICAL! Here are the top moments you missed - smooth vibes, incredible solos, and an unforgettable atmosphere.',
+      hashtags: ['#JazzNight', '#LiveMusic'],
+    },
+    timestamp: '1d',
+    likes: 523,
+    comments: [],
+    shares: 89,
+    views: 8740,
+    isLiked: false,
+    isSaved: false,
+    isHighlight: true,
+    totalHighlightViews: 8740,
+    highlights: [
+      {
+        id: 1,
+        thumbnail: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=400&h=600&fit=crop',
+        duration: '1:23',
+        title: 'Saxophone Solo',
+        views: 3120,
+      },
+      {
+        id: 2,
+        thumbnail: 'https://images.unsplash.com/photo-1511192336575-5a79af67a629?w=400&h=600&fit=crop',
+        duration: '0:58',
+        title: 'Piano Tribute',
+        views: 2340,
+      },
+      {
+        id: 3,
+        thumbnail: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=600&fit=crop',
+        duration: '1:45',
+        title: 'Full Band Jam',
+        views: 3280,
+      },
+    ],
+  },
+  {
     id: 6,
     user: {
       name: 'Buki Jenard',
@@ -277,6 +410,13 @@ export function Feed() {
   const [lastTap, setLastTap] = useState<number>(0);
   const [expandedPostId, setExpandedPostId] = useState<number | null>(null);
   const [commentTexts, setCommentTexts] = useState<{ [key: number]: string }>({});
+  const [playingVideo, setPlayingVideo] = useState<{ postId: number; clipIndex: number; clips: HighlightClip[] } | null>(null);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [showControls, setShowControls] = useState(true);
+  const [lastVideoTap, setLastVideoTap] = useState<number>(0);
+  const [rewindAnimation, setRewindAnimation] = useState<{ show: boolean; direction: 'left' | 'right' } | null>(null);
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
+  const [activeClipIndex, setActiveClipIndex] = useState<{ [key: number]: number }>({});
   
   const unreadCount = notifications.filter((n) => !n.read).length;
 
@@ -595,8 +735,116 @@ export function Feed() {
                 </div>
               )}
 
-              {/* Image - Rounded Inside Card */}
-              {post.content.image && (
+              {/* EVENT HIGHLIGHTS - SINGLE VERTICAL CARD WITH CAROUSEL (only for highlight posts) */}
+              {post.isHighlight && post.highlights && post.highlights.length > 0 && (
+                <div className="px-4 pb-4">
+                  {/* Single Vertical Highlight Card */}
+                  <div className="relative">
+                    {/* Horizontal Scrollable Carousel */}
+                    <div 
+                      className="flex gap-3 overflow-x-auto scrollbar-hide snap-x snap-mandatory"
+                      onScroll={(e) => {
+                        const container = e.currentTarget;
+                        const scrollLeft = container.scrollLeft;
+                        const itemWidth = container.offsetWidth;
+                        const currentIndex = Math.round(scrollLeft / itemWidth);
+                        setActiveClipIndex({ ...activeClipIndex, [post.id]: currentIndex });
+                      }}
+                    >
+                      {post.highlights.map((clip, idx) => (
+                        <div
+                          key={clip.id}
+                          className="flex-shrink-0 w-full snap-center"
+                        >
+                          <div
+                            className="relative cursor-pointer group"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPlayingVideo({ postId: post.id, clipIndex: idx, clips: post.highlights! });
+                            }}
+                          >
+                            {/* Vertical Highlight Card - Premium Style */}
+                            <div className="relative rounded-2xl overflow-hidden aspect-[4/5] bg-gradient-to-br from-purple-100 to-pink-100 shadow-lg">
+                              {/* Highlight Thumbnail */}
+                              <ImageWithFallback
+                                src={clip.thumbnail}
+                                alt={clip.title}
+                                className="w-full h-full object-cover"
+                              />
+                              
+                              {/* Cinematic Gradient Overlay */}
+                              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/80"></div>
+                              
+                              {/* EVENTZ Signature Border */}
+                              <div className="absolute inset-0 rounded-2xl ring-2 ring-purple-500/30 group-hover:ring-purple-500/60 transition-all"></div>
+                              
+                              {/* Play Button - Center */}
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-16 h-16 bg-white/95 backdrop-blur-sm rounded-full flex items-center justify-center shadow-2xl group-hover:scale-110 transition-all duration-300">
+                                  <Play className="w-8 h-8 text-[#8A2BE2] fill-[#8A2BE2] ml-0.5" />
+                                </div>
+                              </div>
+                              
+                              {/* Duration Badge - Top Right */}
+                              <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/90 backdrop-blur-md rounded-lg border border-white/10">
+                                <span className="text-white text-xs font-bold">{clip.duration}</span>
+                              </div>
+                              
+                              {/* Clip Index Badge - Top Left */}
+                              <div className="absolute top-3 left-3 px-2.5 py-1 bg-[#8A2BE2] backdrop-blur-md rounded-lg shadow-lg">
+                                <span className="text-white text-xs font-bold">{idx + 1}/{post.highlights.length}</span>
+                              </div>
+                              
+                              {/* Clip Info - Bottom Overlay */}
+                              <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 to-transparent">
+                                <h4 className="text-white font-bold text-base mb-1.5 line-clamp-2 leading-tight">
+                                  {clip.title}
+                                </h4>
+                                <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full">
+                                    <Eye className="w-3.5 h-3.5 text-white" />
+                                    <span className="text-white text-xs font-bold">
+                                      {clip.views >= 1000 
+                                        ? `${(clip.views / 1000).toFixed(1)}K` 
+                                        : clip.views} views
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Carousel Dots Indicator */}
+                    {post.highlights.length > 1 && (
+                      <div className="flex items-center justify-center gap-1.5 mt-3">
+                        {post.highlights.map((_, idx) => (
+                          <div
+                            key={idx}
+                            className="h-1.5 rounded-full bg-purple-200 transition-all duration-300 ease-out"
+                            style={{ width: idx === (activeClipIndex[post.id] || 0) ? '24px' : '8px' }}
+                          ></div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Total Highlight Views - Minimalist Badge */}
+                  {post.totalHighlightViews && (
+                    <div className="mt-3 flex items-center justify-center gap-2 text-gray-500 text-xs">
+                      <Video className="w-3.5 h-3.5" />
+                      <span className="font-medium">
+                        {post.totalHighlightViews.toLocaleString()} total views
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Image - Rounded Inside Card (only for non-highlight posts) */}
+              {post.content.image && !post.isHighlight && (
                 <div className="px-4 pb-4">
                   <div className="relative rounded-xl overflow-hidden">
                     <ImageWithFallback
@@ -1024,6 +1272,225 @@ export function Feed() {
         </div>
       )}
 
+      {/* Full-Screen Video Player - Instagram/Snapchat/YouTube Shorts Style */}
+      {playingVideo && (
+        <div className="fixed inset-0 bg-black z-[60]">
+          {/* Progress Bars - Top (Instagram Stories Style) */}
+          {playingVideo.clips.length > 1 && (
+            <div className="absolute top-2 left-0 right-0 z-20 px-2 flex gap-1">
+              {playingVideo.clips.map((_, idx) => (
+                <div key={idx} className="flex-1 h-0.5 bg-white/30 rounded-full overflow-hidden">
+                  <div 
+                    className={`h-full bg-white rounded-full transition-all duration-300 ease-out ${
+                      idx === playingVideo.clipIndex ? 'w-full' : idx < playingVideo.clipIndex ? 'w-full' : 'w-0'
+                    }`}
+                  ></div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Top Controls - Minimal */}
+          <div className={`absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/60 to-transparent px-4 pt-12 pb-6 transition-opacity ${
+            showControls ? 'opacity-100' : 'opacity-0'
+          }`}>
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => {
+                  setPlayingVideo(null);
+                  setIsPlaying(true);
+                  setShowControls(true);
+                }}
+                className="p-2 bg-white/10 backdrop-blur-md hover:bg-white/20 rounded-full transition-all"
+              >
+                <X className="w-6 h-6 text-white" />
+              </button>
+              <div className="px-3 py-1 bg-white/20 backdrop-blur-md rounded-full">
+                <span className="text-white text-xs font-bold">
+                  {playingVideo.clipIndex + 1}/{playingVideo.clips.length}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Video Player - Center Tap Area */}
+          <div 
+            className="relative w-full h-full flex items-center justify-center"
+            onTouchStart={(e) => {
+              const touch = e.touches[0];
+              setTouchStart({ x: touch.clientX, y: touch.clientY });
+            }}
+            onTouchEnd={(e) => {
+              if (!touchStart) return;
+              
+              const touch = e.changedTouches[0];
+              const deltaX = touch.clientX - touchStart.x;
+              const deltaY = touch.clientY - touchStart.y;
+              
+              // Check if it's a horizontal swipe (more horizontal than vertical)
+              if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+                if (playingVideo.clips.length > 1) {
+                  if (deltaX > 0) {
+                    // Swipe right = Previous clip
+                    setPlayingVideo({
+                      ...playingVideo,
+                      clipIndex: playingVideo.clipIndex > 0 ? playingVideo.clipIndex - 1 : playingVideo.clips.length - 1
+                    });
+                  } else {
+                    // Swipe left = Next clip
+                    setPlayingVideo({
+                      ...playingVideo,
+                      clipIndex: playingVideo.clipIndex < playingVideo.clips.length - 1 ? playingVideo.clipIndex + 1 : 0
+                    });
+                  }
+                }
+              }
+              
+              setTouchStart(null);
+            }}
+            onClick={(e) => {
+              const currentTime = new Date().getTime();
+              const tapLength = currentTime - lastVideoTap;
+              const rect = e.currentTarget.getBoundingClientRect();
+              const clickX = e.clientX - rect.left;
+              const width = rect.width;
+              
+              // Double tap detected (less than 300ms between taps)
+              if (tapLength < 300 && tapLength > 0) {
+                const video = document.getElementById('highlight-video') as HTMLVideoElement;
+                if (video) {
+                  if (clickX < width * 0.5) {
+                    // Double tap left = Rewind 10 seconds
+                    video.currentTime = Math.max(0, video.currentTime - 10);
+                    setRewindAnimation({ show: true, direction: 'left' });
+                    setTimeout(() => setRewindAnimation(null), 800);
+                  } else {
+                    // Double tap right = Forward 10 seconds
+                    video.currentTime = Math.min(video.duration, video.currentTime + 10);
+                    setRewindAnimation({ show: true, direction: 'right' });
+                    setTimeout(() => setRewindAnimation(null), 800);
+                  }
+                }
+                setLastVideoTap(0);
+                return;
+              }
+              
+              setLastVideoTap(currentTime);
+              
+              // Single tap logic (after delay to check for double tap)
+              setTimeout(() => {
+                if (new Date().getTime() - currentTime < 280) return; // Double tap in progress
+                
+                // If clicked on sides (30% left or right), navigate clips
+                if (playingVideo.clips.length > 1) {
+                  if (clickX < width * 0.3) {
+                    // Left side - Previous clip
+                    setPlayingVideo({
+                      ...playingVideo,
+                      clipIndex: playingVideo.clipIndex > 0 ? playingVideo.clipIndex - 1 : playingVideo.clips.length - 1
+                    });
+                    return;
+                  } else if (clickX > width * 0.7) {
+                    // Right side - Next clip
+                    setPlayingVideo({
+                      ...playingVideo,
+                      clipIndex: playingVideo.clipIndex < playingVideo.clips.length - 1 ? playingVideo.clipIndex + 1 : 0
+                    });
+                    return;
+                  }
+                }
+                
+                // Center tap - Play/Pause
+                const video = document.getElementById('highlight-video') as HTMLVideoElement;
+                if (video) {
+                  if (isPlaying) {
+                    video.pause();
+                    setIsPlaying(false);
+                  } else {
+                    video.play();
+                    setIsPlaying(true);
+                  }
+                  setShowControls(true);
+                  setTimeout(() => setShowControls(false), 2000);
+                }
+              }, 300);
+            }}
+          >
+            {/* Video Element */}
+            <video
+              id="highlight-video"
+              autoPlay
+              playsInline
+              loop
+              className="w-full h-full object-contain"
+              poster={playingVideo.clips[playingVideo.clipIndex].thumbnail}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+            >
+              <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4" />
+            </video>
+
+            {/* Play/Pause Icon - Center (Shows briefly when tapped) */}
+            <div className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity ${
+              showControls && !isPlaying ? 'opacity-100' : 'opacity-0'
+            }`}>
+              <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center">
+                <Play className="w-10 h-10 text-white fill-white ml-1" />
+              </div>
+            </div>
+
+            {/* Rewind/Forward Animation - Instagram Style */}
+            {rewindAnimation?.show && (
+              <div className={`absolute inset-0 flex items-center ${
+                rewindAnimation.direction === 'left' ? 'justify-start pl-12' : 'justify-end pr-12'
+              } pointer-events-none`}>
+                <div className="animate-rewindPulse">
+                  <div className="w-16 h-16 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center">
+                    {rewindAnimation.direction === 'left' ? (
+                      <div className="flex items-center">
+                        <ArrowLeft className="w-6 h-6 text-white -mr-2" />
+                        <ArrowLeft className="w-6 h-6 text-white" />
+                      </div>
+                    ) : (
+                      <div className="flex items-center">
+                        <Play className="w-6 h-6 text-white fill-white -mr-2 ml-1" />
+                        <Play className="w-6 h-6 text-white fill-white ml-1" />
+                      </div>
+                    )}
+                  </div>
+                  <span className="block text-center text-white text-xs font-bold mt-2 drop-shadow-lg">
+                    10s
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Bottom Info - Minimal (Instagram/TikTok Style) */}
+          <div className={`absolute bottom-0 left-0 right-0 z-10 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-5 pb-8 pt-20 transition-opacity ${
+            showControls ? 'opacity-100' : 'opacity-0'
+          }`}>
+            <h3 className="text-white font-bold text-lg mb-2 drop-shadow-lg">
+              {playingVideo.clips[playingVideo.clipIndex].title}
+            </h3>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <Eye className="w-4 h-4 text-white" />
+                <span className="text-white text-sm font-medium">
+                  {playingVideo.clips[playingVideo.clipIndex].views >= 1000 
+                    ? `${(playingVideo.clips[playingVideo.clipIndex].views / 1000).toFixed(1)}K` 
+                    : playingVideo.clips[playingVideo.clipIndex].views}
+                </span>
+              </div>
+              <span className="text-white/60">•</span>
+              <span className="text-white text-sm font-medium">
+                {playingVideo.clips[playingVideo.clipIndex].duration}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style dangerouslySetInnerHTML={{__html: `
         @keyframes slideUp {
           from {
@@ -1061,11 +1528,28 @@ export function Feed() {
             transform: scale(0.8) translateY(-60px) rotate(0deg);
           }
         }
+        @keyframes rewindPulse {
+          0% {
+            opacity: 0;
+            transform: scale(0.5);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.1);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+        }
         .animate-likePopup {
           animation: likePopup 1s ease-out forwards;
         }
         .animate-slideDown {
           animation: slideDown 0.3s ease-out forwards;
+        }
+        .animate-rewindPulse {
+          animation: rewindPulse 0.8s ease-out forwards;
         }
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
