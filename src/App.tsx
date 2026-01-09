@@ -10,6 +10,7 @@ import { Notifications } from './components/Notifications';
 import { Profile } from './components/Profile';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { PWAStatusIndicator } from './components/PWAStatusIndicator';
+import { PWADebugInfo } from './components/PWADebugInfo';
 import { Calendar, Radio, PlusCircle, Bell, User, Rss } from 'lucide-react';
 import { Toaster } from 'sonner@2.0.3';
 import { registerServiceWorker } from './utils/registerSW';
@@ -361,6 +362,7 @@ export default function App() {
       </nav>
       <PWAInstallPrompt />
       <PWAStatusIndicator />
+      <PWADebugInfo />
     </div>
   );
 }
