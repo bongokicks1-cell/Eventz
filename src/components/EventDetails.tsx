@@ -5921,30 +5921,31 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
       {/* Ticket Purchase Modal */}
       {showTicketModal && eventToPurchase && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTicketModal(false)}>
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
             {/* Header */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
+            <div className="px-6 pt-6 pb-4">
+              <div className="flex items-center justify-between mb-4">
                 <button 
                   onClick={() => setShowTicketModal(false)}
-                  className="text-purple-600 hover:text-purple-700 flex items-center gap-1"
+                  className="text-purple-600 hover:text-purple-700 flex items-center gap-1.5 font-medium touch-manipulation active:scale-95 transition-transform"
                 >
-                  <ChevronLeft className="w-4 h-4" />
-                  Back
+                  <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+                  <span className="text-sm">Back</span>
                 </button>
                 <button 
                   onClick={() => setShowTicketModal(false)}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-500 hover:text-gray-700 transition-colors p-2 -mr-2 touch-manipulation active:scale-95"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-6 h-6 stroke-[2.5]" />
                 </button>
               </div>
               <div>
-                <h2 className="text-gray-900 text-2xl mb-1">Purchase Virtual Ticket</h2>
-                <p className="text-gray-600">{eventToPurchase.title}</p>
+                <h2 className="text-gray-900 text-2xl font-semibold mb-1">Purchase Virtual Ticket</h2>
+                <p className="text-gray-600 text-sm">{eventToPurchase.title}</p>
               </div>
             </div>
 
+            <div className="px-6 pb-6">
             {/* Event Info */}
             <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 to-cyan-50 rounded-xl border border-purple-200">
               <div className="flex items-center gap-3 mb-3">
@@ -6032,6 +6033,7 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
             <p className="text-gray-500 text-xs text-center mt-4">
               ✉️ You'll receive your ticket confirmation via email with access details
             </p>
+            </div>
           </div>
         </div>
       )}
