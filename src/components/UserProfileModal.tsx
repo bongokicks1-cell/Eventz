@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { X, MapPin, Calendar, Users, CheckCircle2, Star, Share2, Heart, Video, Play } from 'lucide-react';
+import { X, MapPin, Calendar, Users, CheckCircle2, Star, Share2, Heart, Video, Play, MessageCircle } from 'lucide-react';
 import { MediaViewer } from './MediaViewer';
 
 interface UserProfile {
@@ -54,9 +54,10 @@ interface UserProfileModalProps {
   user: UserProfile;
   onClose: () => void;
   onFollow?: () => void;
+  onMessage?: () => void;
 }
 
-export function UserProfileModal({ user, onClose, onFollow }: UserProfileModalProps) {
+export function UserProfileModal({ user, onClose, onFollow, onMessage }: UserProfileModalProps) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [activeTab, setActiveTab] = useState<'events' | 'photos' | 'videos'>('events');
@@ -159,6 +160,17 @@ export function UserProfileModal({ user, onClose, onFollow }: UserProfileModalPr
                 <div className="text-xs text-gray-600 font-semibold">Followers</div>
               </div>
             </div>
+
+            {/* Message Button */}
+            {onMessage && (
+              <button
+                onClick={onMessage}
+                className="w-full mb-6 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span className="text-sm font-medium">Message</span>
+              </button>
+            )}
 
             {/* About */}
             <div className="mb-6">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { MapPin, Calendar, DollarSign, Share2, Bookmark, Users, ChevronRight, ChevronLeft, Clock, X, Filter, Radio, Tv, Play, Eye, CheckCircle2, Search, MoreVertical, Mail, MessageCircle, Copy, Check, Bell } from 'lucide-react';
+import { MapPin, Calendar, DollarSign, Share2, Bookmark, Users, ChevronRight, ChevronLeft, Clock, X, Filter, Radio, Tv, Play, Eye, CheckCircle2, Search, MoreVertical, Mail, MessageCircle, Copy, Check, Bell, Send } from 'lucide-react';
 import { OrganizerProfile } from './OrganizerProfile';
 import { toast } from 'sonner@2.0.3';
 import { PurchasedTicket } from '../App';
@@ -14,6 +14,32 @@ import hennessyPoster from 'figma:asset/86729da933e180c2188b5a326ae17c48bda85b9d
 import vintageSpacePoster from 'figma:asset/95b9c37c292bb18313f0eb859f9f372fdc547d97.png';
 import bukiJenardCover from 'figma:asset/84bca774e8638978da6b9a5588dd8ef8481492a4.png';
 import luchyRanksCover from 'figma:asset/8ec3165de81ea3f3c210518a2ea2c83f98b3b9ac.png';
+
+interface Message {
+  id: number;
+  senderId: number;
+  text: string;
+  timestamp: string;
+  read: boolean;
+}
+
+interface Conversation {
+  id: number;
+  user: {
+    name: string;
+    username?: string;
+    avatar: string;
+    verified: boolean;
+    isOrganizer?: boolean;
+  };
+  lastMessage: {
+    text: string;
+    timestamp: string;
+    isRead: boolean;
+  };
+  unreadCount: number;
+  messages: Message[];
+}
 
 interface Event {
   id: number;
@@ -62,6 +88,7 @@ interface EventDetailModalProps {
   hasTicket: (eventId: number) => boolean;
   onPurchaseTicket: (event: Event) => void;
   onPurchaseNormalTicket: (event: Event) => void;
+  onStartConversation?: (user: { name: string; username?: string; avatar: string; verified: boolean; isOrganizer?: boolean }) => void;
 }
 
 const locations = [
@@ -4527,7 +4554,7 @@ const attendeeImages = [
   'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=100&h=100&fit=crop',
 ];
 
-function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurchaseNormalTicket }: EventDetailModalProps) {
+function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurchaseNormalTicket, onStartConversation }: EventDetailModalProps) {
   const [isSaved, setIsSaved] = useState(event.isSaved || false);
   const [showOrganizerProfile, setShowOrganizerProfile] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -4665,6 +4692,12 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
             <OrganizerProfile
               organizerName={event.organizer}
               onClose={() => setShowOrganizerProfile(false)}
+              onMessage={(organizer) => {
+                setShowOrganizerProfile(false);
+                if (onStartConversation) {
+                  onStartConversation(organizer);
+                }
+              }}
             />
           )}
           
@@ -5076,6 +5109,12 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
   const [showMediaViewer, setShowMediaViewer] = useState(false);
   const [mediaViewerIndex, setMediaViewerIndex] = useState(0);
   const [mediaViewerType, setMediaViewerType] = useState<'photo' | 'video'>('photo');
+  
+  // Messaging state
+  const [showMessages, setShowMessages] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [messageText, setMessageText] = useState('');
 
   const categories = [
     { id: 'all', name: 'All', icon: '🌟' },
@@ -5115,6 +5154,67 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
     likes: Math.floor(Math.random() * 500) + 50,
     videoUrl: highlight.video!,
   })) || [];
+
+  const handleStartConversation = (user: { name: string; username?: string; avatar: string; verified: boolean; isOrganizer?: boolean }) => {
+    // Close user profile modal
+    setSelectedUser(null);
+    
+    // Check if conversation already exists
+    const existingConv = conversations.find(conv => conv.user.name === user.name);
+    
+    if (existingConv) {
+      // Open existing conversation
+      setActiveConversation(existingConv);
+      setShowMessages(true);
+    } else {
+      // Create new conversation
+      const newConversation: Conversation = {
+        id: Date.now(),
+        user: user,
+        lastMessage: {
+          text: 'Start a conversation...',
+          timestamp: 'Now',
+          isRead: true,
+        },
+        unreadCount: 0,
+        messages: [],
+      };
+      
+      setConversations([newConversation, ...conversations]);
+      setActiveConversation(newConversation);
+      setShowMessages(true);
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (!messageText.trim() || !activeConversation) return;
+
+    const newMessage: Message = {
+      id: Date.now(),
+      senderId: 0, // Current user
+      text: messageText,
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      read: true,
+    };
+
+    // Update conversation
+    const updatedConversation = {
+      ...activeConversation,
+      messages: [...activeConversation.messages, newMessage],
+      lastMessage: {
+        text: messageText,
+        timestamp: 'Now',
+        isRead: true,
+      },
+    };
+
+    setActiveConversation(updatedConversation);
+    setConversations(conversations.map(conv => 
+      conv.id === activeConversation.id ? updatedConversation : conv
+    ));
+
+    setMessageText('');
+  };
 
   const getCategoryColor = (category: string) => {
     switch (category.toLowerCase()) {
@@ -5842,6 +5942,9 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
           onFollow={() => {
             toast.success(`You are now following ${selectedUser.name}!`);
           }}
+          onMessage={() => {
+            handleStartConversation(selectedUser);
+          }}
         />
       )}
 
@@ -5853,6 +5956,7 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
           hasTicket={hasTicket}
           onPurchaseTicket={handlePurchaseTicket}
           onPurchaseNormalTicket={handleNormalTicketPurchase}
+          onStartConversation={handleStartConversation}
         />
       )}
 
@@ -6223,6 +6327,172 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
           onClose={() => setShowMediaViewer(false)}
           type={mediaViewerType}
         />
+      )}
+
+      {/* Messaging Panel */}
+      {showMessages && (
+        <div className="fixed inset-0 bg-black/50 z-50" onClick={() => {
+          if (!activeConversation) setShowMessages(false);
+        }}>
+          <div 
+            className="absolute right-0 top-0 w-full max-w-md bg-white h-full shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {!activeConversation ? (
+              <>
+                {/* Conversations List Header */}
+                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                  <h2 className="text-gray-900">Messages</h2>
+                  <button
+                    onClick={() => setShowMessages(false)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                {/* Conversations List */}
+                <div className="flex-1 overflow-y-auto">
+                  {conversations.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                      <MessageCircle className="w-16 h-16 text-gray-300 mb-4" />
+                      <h3 className="text-gray-900 mb-2">No messages yet</h3>
+                      <p className="text-gray-500 text-sm">Start a conversation with organizers or other users!</p>
+                    </div>
+                  ) : (
+                    conversations.map((conv) => (
+                      <button
+                        key={conv.id}
+                        onClick={() => setActiveConversation(conv)}
+                        className="w-full p-4 flex items-start gap-3 hover:bg-gray-50 transition-colors border-b border-gray-100"
+                      >
+                        <div className="relative">
+                          <ImageWithFallback
+                            src={conv.user.avatar}
+                            alt={conv.user.name}
+                            className="w-12 h-12 rounded-full object-cover"
+                          />
+                          {conv.unreadCount > 0 && (
+                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-[#8A2BE2] rounded-full flex items-center justify-center">
+                              <span className="text-white text-xs font-bold">{conv.unreadCount}</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-1 text-left">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-1">
+                              <span className="text-gray-900 text-sm font-medium">{conv.user.name}</span>
+                              {conv.user.verified && (
+                                <CheckCircle2 className="w-4 h-4 text-white fill-[#8A2BE2]" />
+                              )}
+                            </div>
+                            <span className="text-gray-400 text-xs">{conv.lastMessage.timestamp}</span>
+                          </div>
+                          <p className={`text-sm line-clamp-1 ${conv.lastMessage.isRead ? 'text-gray-500' : 'text-gray-900 font-medium'}`}>
+                            {conv.lastMessage.text}
+                          </p>
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Active Conversation Header */}
+                <div className="p-4 border-b border-gray-200 flex items-center gap-3">
+                  <button
+                    onClick={() => setActiveConversation(null)}
+                    className="text-gray-600 hover:text-gray-900"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <div className="flex items-center gap-3 flex-1">
+                    <ImageWithFallback
+                      src={activeConversation.user.avatar}
+                      alt={activeConversation.user.name}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-900 font-medium">{activeConversation.user.name}</span>
+                        {activeConversation.user.verified && (
+                          <CheckCircle2 className="w-4 h-4 text-white fill-[#8A2BE2]" />
+                        )}
+                      </div>
+                      {activeConversation.user.username && (
+                        <p className="text-gray-500 text-xs">{activeConversation.user.username}</p>
+                      )}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setActiveConversation(null);
+                      setShowMessages(false);
+                    }}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-6 h-6" />
+                  </button>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {activeConversation.messages.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                      <MessageCircle className="w-12 h-12 text-gray-300 mb-3" />
+                      <p className="text-gray-500 text-sm">Send a message to start the conversation</p>
+                    </div>
+                  ) : (
+                    activeConversation.messages.map((msg) => (
+                      <div
+                        key={msg.id}
+                        className={`flex ${msg.senderId === 0 ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`max-w-[75%] ${msg.senderId === 0 ? 'order-2' : 'order-1'}`}>
+                          <div className={`px-4 py-2 rounded-2xl ${
+                            msg.senderId === 0 
+                              ? 'bg-[#8A2BE2] text-white' 
+                              : 'bg-gray-100 text-gray-900'
+                          }`}>
+                            <p className="text-sm">{msg.text}</p>
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1 px-2">{msg.timestamp}</p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Message Input */}
+                <div className="p-4 border-t border-gray-200">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={messageText}
+                      onChange={(e) => setMessageText(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      placeholder="Type a message..."
+                      className="flex-1 px-4 py-2.5 bg-gray-100 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#8A2BE2]"
+                    />
+                    <button
+                      onClick={handleSendMessage}
+                      disabled={!messageText.trim()}
+                      className="w-10 h-10 bg-[#8A2BE2] text-white rounded-full flex items-center justify-center hover:bg-[#7526c7] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Send className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

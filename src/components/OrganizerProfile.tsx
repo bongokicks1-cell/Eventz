@@ -44,6 +44,7 @@ interface OrganizerProfileProps {
   organizerName: string;
   onClose: () => void;
   onTicketPurchase?: (ticket: PurchasedTicket) => void;
+  onMessage?: (organizer: { name: string; avatar: string; verified: boolean; isOrganizer: boolean }) => void;
 }
 
 // Mock organizer data
@@ -554,7 +555,7 @@ const organizersData: { [key: string]: OrganizerData } = {
   },
 };
 
-export function OrganizerProfile({ organizerName, onClose, onTicketPurchase }: OrganizerProfileProps) {
+export function OrganizerProfile({ organizerName, onClose, onTicketPurchase, onMessage }: OrganizerProfileProps) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showMediaViewer, setShowMediaViewer] = useState(false);
@@ -671,6 +672,24 @@ export function OrganizerProfile({ organizerName, onClose, onTicketPurchase }: O
               <div className="text-xs text-gray-600 font-semibold">Followers</div>
             </div>
           </div>
+
+          {/* Message Button */}
+          <button
+            onClick={() => {
+              if (onMessage) {
+                onMessage({
+                  name: organizer.name,
+                  avatar: organizer.avatar,
+                  verified: organizer.verified,
+                  isOrganizer: true,
+                });
+              }
+            }}
+            className="w-full mb-6 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2"
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span className="text-sm font-medium">Message</span>
+          </button>
 
           {/* About */}
           <div className="mb-6">

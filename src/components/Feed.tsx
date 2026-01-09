@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus, ThumbsUp, Play, Video, Flame, Zap, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { UserProfileModal } from './UserProfileModal';
 
 interface Comment {
   id: number;
@@ -550,6 +551,7 @@ export function Feed() {
   const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
   const [messageText, setMessageText] = useState('');
+  const [selectedUserProfile, setSelectedUserProfile] = useState<{ name: string; username: string; avatar: string; verified: boolean; isOrganizer?: boolean } | null>(null);
   const [messageSearch, setMessageSearch] = useState('');
   const [likeAnimation, setLikeAnimation] = useState<{ show: boolean; x: number; y: number }>({ show: false, x: 0, y: 0 });
   const [lastTap, setLastTap] = useState<number>(0);
@@ -783,7 +785,6 @@ export function Feed() {
       // Open existing conversation
       setActiveConversation(existingConv);
       setShowMessages(true);
-      toast.success('Opening chat! 💬');
     } else {
       // Create new conversation
       const newConversation: Conversation = {
@@ -801,8 +802,12 @@ export function Feed() {
       setConversations([newConversation, ...conversations]);
       setActiveConversation(newConversation);
       setShowMessages(true);
-      toast.success(`Starting chat with ${user.name}! 💬`);
     }
+  };
+
+  const handleOpenUserProfile = (user: { name: string; username: string; avatar: string; verified: boolean; isOrganizer?: boolean }, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setSelectedUserProfile(user);
   };
 
   const filteredPosts = posts.filter(post => {
@@ -916,11 +921,17 @@ export function Feed() {
                     <img
                       src={post.user.avatar}
                       alt={post.user.name}
-                      className="w-11 h-11 rounded-xl object-cover ring-2 ring-purple-100"
+                      className="w-11 h-11 rounded-xl object-cover ring-2 ring-purple-100 cursor-pointer hover:ring-purple-300 transition-all"
+                      onClick={(e) => handleOpenUserProfile(post.user, e)}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-gray-900 text-sm font-semibold truncate">{post.user.name}</span>
+                        <span 
+                          className="text-gray-900 text-sm font-semibold truncate cursor-pointer hover:text-purple-600 transition-colors"
+                          onClick={(e) => handleOpenUserProfile(post.user, e)}
+                        >
+                          {post.user.name}
+                        </span>
                         {post.user.verified && (
                           <div className="flex-shrink-0 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
                             <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -1353,11 +1364,17 @@ export function Feed() {
                   <img
                     src={selectedPost.user.avatar}
                     alt={selectedPost.user.name}
-                    className="w-14 h-14 rounded-2xl object-cover ring-4 ring-purple-100"
+                    className="w-14 h-14 rounded-2xl object-cover ring-4 ring-purple-100 cursor-pointer hover:ring-purple-300 transition-all"
+                    onClick={(e) => handleOpenUserProfile(selectedPost.user, e)}
                   />
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-gray-900 font-bold">{selectedPost.user.name}</span>
+                      <span 
+                        className="text-gray-900 font-bold cursor-pointer hover:text-purple-600 transition-colors"
+                        onClick={(e) => handleOpenUserProfile(selectedPost.user, e)}
+                      >
+                        {selectedPost.user.name}
+                      </span>
                       {selectedPost.user.verified && (
                         <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
                           <svg className="w-2.5 h-2.5 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -2203,6 +2220,80 @@ export function Feed() {
             </div>
           )}
         </div>
+      )}
+
+      {/* User Profile Modal */}
+      {selectedUserProfile && (
+        <UserProfileModal
+          user={{
+            name: selectedUserProfile.name,
+            type: selectedUserProfile.isOrganizer ? 'Organizer' : 'Attendee',
+            followers: '2.8k',
+            following: '1.2k',
+            eventsHosted: selectedUserProfile.isOrganizer ? 24 : undefined,
+            eventsAttended: !selectedUserProfile.isOrganizer ? 156 : undefined,
+            avatar: selectedUserProfile.avatar,
+            coverImage: selectedUserProfile.name === 'Buki Jenard' 
+              ? 'https://i.ibb.co/F2wGf9R/B-Cover.jpg' 
+              : selectedUserProfile.name === 'Luchy Ranks' 
+              ? 'https://i.ibb.co/k2Jg34Nv/L-cover.jpg' 
+              : 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1200',
+            bio: selectedUserProfile.isOrganizer 
+              ? 'Professional event organizer specializing in creating unforgettable experiences. Passionate about bringing people together through music, culture, and celebration.' 
+              : 'Event enthusiast and social butterfly. Love discovering new experiences and meeting amazing people!',
+            location: 'Dar es Salaam',
+            verified: selectedUserProfile.verified,
+            joinedDate: 'January 2023',
+            email: selectedUserProfile.name.toLowerCase().replace(' ', '.') + '@eventz.com',
+            phone: '+255 712 345 678',
+            instagram: selectedUserProfile.name.toLowerCase().replace(' ', ''),
+            twitter: selectedUserProfile.name.toLowerCase().replace(' ', '_'),
+            highlights: selectedUserProfile.isOrganizer ? [
+              {
+                id: 1,
+                image: 'https://images.unsplash.com/photo-1658046413536-6e5933dfd939?w=400&h=300&fit=crop',
+                title: 'Summer Festival 2024',
+                date: 'Dec 15, 2024',
+                attendees: 4500,
+              },
+              {
+                id: 2,
+                image: 'https://images.unsplash.com/photo-1751998689590-f7ae39d9d218?w=400&h=300&fit=crop',
+                title: 'New Year Bash',
+                date: 'Jan 1, 2025',
+                attendees: 5200,
+              },
+            ] : [
+              {
+                id: 1,
+                image: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=400&h=300&fit=crop',
+                title: 'Afrobeat Festival',
+                date: 'Nov 20, 2024',
+                attendees: 3200,
+              },
+              {
+                id: 2,
+                image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=400&h=300&fit=crop',
+                title: 'Jazz Night Live',
+                date: 'Dec 8, 2024',
+                attendees: 1800,
+              },
+            ],
+            photos: [
+              { id: 1, image: 'https://images.unsplash.com/photo-1658046413536-6e5933dfd939?w=400&h=300&fit=crop', size: 'large' as const },
+              { id: 2, image: 'https://images.unsplash.com/photo-1605286232233-e448650f5914?w=400&h=300&fit=crop', size: 'small' as const },
+              { id: 3, image: 'https://images.unsplash.com/photo-1607313029691-fa108ddf807d?w=400&h=300&fit=crop', size: 'small' as const },
+            ],
+          }}
+          onClose={() => setSelectedUserProfile(null)}
+          onFollow={() => {
+            toast.success(`Following ${selectedUserProfile.name}! 🎉`);
+          }}
+          onMessage={() => {
+            handleStartConversation(selectedUserProfile);
+            setSelectedUserProfile(null);
+          }}
+        />
       )}
     </>
   );

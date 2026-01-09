@@ -4473,6 +4473,12 @@
   }
 
   @media (hover: hover) {
+    .hover\:ring-purple-300:hover {
+      --tw-ring-color: var(--color-purple-300);
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:ring-white\/40:hover {
       --tw-ring-color: #fff6;
     }
