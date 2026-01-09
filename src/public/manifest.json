@@ -1,15 +1,13 @@
 {
-  "name": "EVENTZ - The Netflix of Live Events",
+  "name": "EVENTZ - HD Live Events",
   "short_name": "EVENTZ",
-  "description": "Watch concerts, club shows, and events live in HD with virtual tickets, multi-camera angles, live chat, and replay features",
+  "description": "The Netflix of Live Events - Watch concerts, club shows, and events live in HD with virtual tickets, multi-camera angles, live chat, and replay features",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#8A2BE2",
   "theme_color": "#8A2BE2",
   "orientation": "portrait-primary",
   "categories": ["entertainment", "lifestyle", "social"],
-  "prefer_related_applications": false,
-  "scope": "/",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
