@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus, ThumbsUp, Play, Video, Flame, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus, ThumbsUp, Play, Video, Flame, Zap, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 
 interface Comment {
@@ -67,6 +67,119 @@ interface Notification {
   image?: string;
   read: boolean;
 }
+
+interface Message {
+  id: number;
+  senderId: number;
+  text: string;
+  timestamp: string;
+  read: boolean;
+}
+
+interface Conversation {
+  id: number;
+  user: {
+    name: string;
+    username: string;
+    avatar: string;
+    verified: boolean;
+    isOrganizer?: boolean;
+  };
+  lastMessage: {
+    text: string;
+    timestamp: string;
+    isRead: boolean;
+  };
+  unreadCount: number;
+  messages: Message[];
+}
+
+const mockConversations: Conversation[] = [
+  {
+    id: 1,
+    user: {
+      name: 'Jazz Events TZ',
+      username: '@jazzeventstz',
+      avatar: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100&h=100&fit=crop',
+      verified: true,
+      isOrganizer: true,
+    },
+    lastMessage: {
+      text: 'Thank you for attending! Hope you enjoyed the show 🎷',
+      timestamp: '5m ago',
+      isRead: false,
+    },
+    unreadCount: 2,
+    messages: [
+      { id: 1, senderId: 1, text: 'Hey! Thanks for getting tickets to Jazz Night!', timestamp: '2:30 PM', read: true },
+      { id: 2, senderId: 0, text: 'Can\'t wait! What time does it start?', timestamp: '2:32 PM', read: true },
+      { id: 3, senderId: 1, text: 'Doors open at 7 PM, show starts at 8 PM sharp!', timestamp: '2:35 PM', read: true },
+      { id: 4, senderId: 1, text: 'Thank you for attending! Hope you enjoyed the show 🎷', timestamp: '10:45 PM', read: false },
+    ],
+  },
+  {
+    id: 2,
+    user: {
+      name: 'Sarah Mitchell',
+      username: '@sarahmitchell',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+      verified: false,
+    },
+    lastMessage: {
+      text: 'Are you going to the Amapiano Festival this weekend?',
+      timestamp: '1h ago',
+      isRead: true,
+    },
+    unreadCount: 0,
+    messages: [
+      { id: 1, senderId: 2, text: 'Hey! Saw you at the concert last night!', timestamp: 'Yesterday', read: true },
+      { id: 2, senderId: 0, text: 'Yes! It was amazing! 🎶', timestamp: 'Yesterday', read: true },
+      { id: 3, senderId: 2, text: 'Are you going to the Amapiano Festival this weekend?', timestamp: '1h ago', read: true },
+    ],
+  },
+  {
+    id: 3,
+    user: {
+      name: 'Dar Live Events',
+      username: '@darliveevents',
+      avatar: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=100&h=100&fit=crop',
+      verified: true,
+      isOrganizer: true,
+    },
+    lastMessage: {
+      text: 'Your VIP tickets have been confirmed! 🎫',
+      timestamp: '3h ago',
+      isRead: true,
+    },
+    unreadCount: 0,
+    messages: [
+      { id: 1, senderId: 3, text: 'Hi! We noticed you\'re interested in VIP packages', timestamp: '5:20 PM', read: true },
+      { id: 2, senderId: 0, text: 'Yes! What\'s included in the VIP package?', timestamp: '5:25 PM', read: true },
+      { id: 3, senderId: 3, text: 'Front row seats, meet & greet, and exclusive merch!', timestamp: '5:27 PM', read: true },
+      { id: 4, senderId: 3, text: 'Your VIP tickets have been confirmed! 🎫', timestamp: '6:15 PM', read: true },
+    ],
+  },
+  {
+    id: 4,
+    user: {
+      name: 'Marcus Rodriguez',
+      username: '@marcusrodriguez',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
+      verified: false,
+    },
+    lastMessage: {
+      text: 'Let me know if you need a ride to the venue',
+      timestamp: '1d ago',
+      isRead: true,
+    },
+    unreadCount: 0,
+    messages: [
+      { id: 1, senderId: 4, text: 'Yo! Got my tickets for Friday!', timestamp: 'Mon', read: true },
+      { id: 2, senderId: 0, text: 'Nice! Me too! 🔥', timestamp: 'Mon', read: true },
+      { id: 3, senderId: 4, text: 'Let me know if you need a ride to the venue', timestamp: 'Tue', read: true },
+    ],
+  },
+];
 
 const mockNotifications: Notification[] = [
   {
@@ -433,6 +546,11 @@ export function Feed() {
   const [commentText, setCommentText] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [showMessages, setShowMessages] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [messageText, setMessageText] = useState('');
+  const [messageSearch, setMessageSearch] = useState('');
   const [likeAnimation, setLikeAnimation] = useState<{ show: boolean; x: number; y: number }>({ show: false, x: 0, y: 0 });
   const [lastTap, setLastTap] = useState<number>(0);
   const [expandedPostId, setExpandedPostId] = useState<number | null>(null);
@@ -449,6 +567,7 @@ export function Feed() {
   const [imageTouchStart, setImageTouchStart] = useState<{ x: number; y: number } | null>(null);
   
   const unreadCount = notifications.filter((n) => !n.read).length;
+  const unreadMessagesCount = conversations.reduce((acc, conv) => acc + conv.unreadCount, 0);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -609,6 +728,83 @@ export function Feed() {
     toast.success('Reply posted! 💬');
   };
 
+  const handleSendMessage = () => {
+    if (!messageText.trim() || !activeConversation) return;
+
+    const newMessage: Message = {
+      id: Date.now(),
+      senderId: 0, // Current user ID (0 represents current user)
+      text: messageText.trim(),
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      read: true,
+    };
+
+    // Update conversations with the new message
+    setConversations(conversations.map(conv => {
+      if (conv.id === activeConversation.id) {
+        return {
+          ...conv,
+          messages: [...conv.messages, newMessage],
+          lastMessage: {
+            text: newMessage.text,
+            timestamp: 'Just now',
+            isRead: true,
+          },
+        };
+      }
+      return conv;
+    }));
+
+    // Update active conversation
+    setActiveConversation({
+      ...activeConversation,
+      messages: [...activeConversation.messages, newMessage],
+      lastMessage: {
+        text: newMessage.text,
+        timestamp: 'Just now',
+        isRead: true,
+      },
+    });
+
+    setMessageText('');
+    toast.success('Message sent! 💬');
+  };
+
+  const handleStartConversation = (user: { name: string; username: string; avatar: string; verified: boolean; isOrganizer?: boolean }, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    
+    // Close post detail if open
+    setSelectedPost(null);
+    
+    // Check if conversation already exists
+    const existingConv = conversations.find(conv => conv.user.username === user.username);
+    
+    if (existingConv) {
+      // Open existing conversation
+      setActiveConversation(existingConv);
+      setShowMessages(true);
+      toast.success('Opening chat! 💬');
+    } else {
+      // Create new conversation
+      const newConversation: Conversation = {
+        id: Date.now(),
+        user: user,
+        lastMessage: {
+          text: 'Start a conversation...',
+          timestamp: 'Now',
+          isRead: true,
+        },
+        unreadCount: 0,
+        messages: [],
+      };
+      
+      setConversations([newConversation, ...conversations]);
+      setActiveConversation(newConversation);
+      setShowMessages(true);
+      toast.success(`Starting chat with ${user.name}! 💬`);
+    }
+  };
+
   const filteredPosts = posts.filter(post => {
     if (activeFilter === 'organizers') return post.user.isOrganizer;
     if (activeFilter === 'trending') return post.likes > 200;
@@ -631,8 +827,16 @@ export function Feed() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <button className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors">
-                  <Search className="w-5 h-5 text-gray-700" />
+                <button
+                  className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors relative"
+                  onClick={() => setShowMessages(!showMessages)}
+                >
+                  <MessageSquare className="w-5 h-5 text-gray-700" />
+                  {unreadMessagesCount > 0 && (
+                    <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] bg-[#8A2BE2] text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
+                      {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                    </span>
+                  )}
                 </button>
                 <button
                   className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors relative"
@@ -997,6 +1201,14 @@ export function Feed() {
                   >
                     <Share2 className="w-4 h-4" />
                   </button>
+
+                  <button
+                    onClick={(e) => handleStartConversation(post.user, e)}
+                    className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 hover:bg-purple-50 hover:text-[#8A2BE2] rounded-lg transition-all"
+                    title="Message"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
 
@@ -1357,6 +1569,228 @@ export function Feed() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Professional Messages Panel */}
+      {showMessages && (
+        <div className="fixed inset-0 bg-black/50 z-40" onClick={() => {
+          if (!activeConversation) setShowMessages(false);
+        }}>
+          <div 
+            className="absolute right-0 top-0 w-full max-w-md bg-white h-full shadow-2xl flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {!activeConversation ? (
+              // Conversations List View
+              <>
+                {/* Header */}
+                <div className="bg-[#8A2BE2] px-5 py-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-white text-2xl font-bold">Messages</h2>
+                    <button
+                      onClick={() => setShowMessages(false)}
+                      className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+                  
+                  {/* Search Bar */}
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search conversations..."
+                      value={messageSearch}
+                      onChange={(e) => setMessageSearch(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 bg-white/95 backdrop-blur-sm rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    />
+                  </div>
+                </div>
+
+                {/* Conversations List */}
+                <div className="flex-1 overflow-y-auto">
+                  {conversations
+                    .filter(conv => 
+                      messageSearch === '' || 
+                      conv.user.name.toLowerCase().includes(messageSearch.toLowerCase()) ||
+                      conv.user.username.toLowerCase().includes(messageSearch.toLowerCase())
+                    )
+                    .map((conversation) => (
+                    <div
+                      key={conversation.id}
+                      onClick={() => setActiveConversation(conversation)}
+                      className="px-5 py-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        {/* Avatar */}
+                        <div className="relative flex-shrink-0">
+                          <img
+                            src={conversation.user.avatar}
+                            alt={conversation.user.name}
+                            className="w-14 h-14 rounded-full object-cover ring-2 ring-gray-100"
+                          />
+                          {conversation.unreadCount > 0 && (
+                            <div className="absolute -top-1 -right-1 min-w-[20px] h-5 bg-[#8A2BE2] text-white text-xs font-bold rounded-full flex items-center justify-center px-1.5">
+                              {conversation.unreadCount}
+                            </div>
+                          )}
+                          {conversation.user.isOrganizer && (
+                            <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-[#8A2BE2] rounded-full flex items-center justify-center ring-2 ring-white">
+                              <Star className="w-2.5 h-2.5 text-white fill-white" />
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Conversation Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              <h3 className={`font-bold truncate ${
+                                conversation.unreadCount > 0 ? 'text-gray-900' : 'text-gray-700'
+                              }`}>
+                                {conversation.user.name}
+                              </h3>
+                              {conversation.user.verified && (
+                                <div className="flex-shrink-0 w-4 h-4 bg-gradient-to-br from-[#00D1FF] to-[#8A2BE2] rounded-full flex items-center justify-center">
+                                  <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                  </svg>
+                                </div>
+                              )}
+                            </div>
+                            <span className="text-xs text-gray-400 flex-shrink-0 ml-2">
+                              {conversation.lastMessage.timestamp}
+                            </span>
+                          </div>
+                          <p className={`text-sm truncate ${
+                            conversation.unreadCount > 0 ? 'text-gray-900 font-semibold' : 'text-gray-500'
+                          }`}>
+                            {conversation.lastMessage.text}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              // Individual Chat View
+              <>
+                {/* Chat Header */}
+                <div className="bg-[#8A2BE2] px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setActiveConversation(null)}
+                      className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                    >
+                      <ArrowLeft className="w-5 h-5 text-white" />
+                    </button>
+                    
+                    <div className="relative">
+                      <img
+                        src={activeConversation.user.avatar}
+                        alt={activeConversation.user.name}
+                        className="w-10 h-10 rounded-full object-cover ring-2 ring-white/50"
+                      />
+                      {activeConversation.user.isOrganizer && (
+                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#8A2BE2] rounded-full flex items-center justify-center ring-2 ring-white">
+                          <Star className="w-2 h-2 text-white fill-white" />
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="text-white font-bold truncate">
+                          {activeConversation.user.name}
+                        </h3>
+                        {activeConversation.user.verified && (
+                          <div className="flex-shrink-0 w-4 h-4 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center">
+                            <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-white/80 text-xs">{activeConversation.user.username}</p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setActiveConversation(null);
+                        setShowMessages(false);
+                      }}
+                      className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto bg-gray-50 px-5 py-4">
+                  <div className="space-y-4">
+                    {activeConversation.messages.map((message) => {
+                      const isMe = message.senderId === 0;
+                      return (
+                        <div
+                          key={message.id}
+                          className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div className={`max-w-[75%] ${isMe ? 'order-2' : 'order-1'}`}>
+                            <div
+                              className={`rounded-2xl px-4 py-2.5 ${
+                                isMe
+                                  ? 'bg-[#8A2BE2] text-white'
+                                  : 'bg-white text-gray-900 shadow-sm'
+                              }`}
+                            >
+                              <p className="text-sm leading-relaxed">{message.text}</p>
+                            </div>
+                            <span className={`text-xs text-gray-400 mt-1 block ${
+                              isMe ? 'text-right' : 'text-left'
+                            }`}>
+                              {message.timestamp}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Message Input */}
+                <div className="bg-white border-t border-gray-100 px-5 py-4">
+                  <div className="flex items-end gap-3">
+                    <div className="flex-1 relative">
+                      <textarea
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        placeholder="Type a message..."
+                        rows={1}
+                        className="w-full px-4 py-3 bg-gray-100 rounded-2xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#8A2BE2]/50 resize-none"
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                          }
+                        }}
+                      />
+                    </div>
+                    <button
+                      onClick={handleSendMessage}
+                      disabled={!messageText.trim()}
+                      className="p-3 bg-[#8A2BE2] rounded-full hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    >
+                      <Send className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
