@@ -5921,31 +5921,31 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
       {/* Ticket Purchase Modal */}
       {showTicketModal && eventToPurchase && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setShowTicketModal(false)}>
-          <div className="bg-white rounded-t-2xl sm:rounded-2xl max-w-md w-full shadow-2xl max-h-[95vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            {/* Header with Navigation */}
-            <div className="relative px-6 pt-5 pb-4 border-b border-gray-100">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl max-w-md w-full shadow-2xl max-h-[95vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* Header with Navigation - STICKY */}
+            <div className="sticky top-0 z-10 bg-white rounded-t-2xl sm:rounded-t-2xl px-6 pt-6 pb-4 border-b border-gray-200 shadow-sm">
               <div className="flex items-center justify-between mb-3">
                 <button 
                   onClick={() => setShowTicketModal(false)}
-                  className="flex items-center gap-1.5 text-[#8A2BE2] hover:text-[#7020c0] font-semibold text-base touch-manipulation active:scale-95 transition-all -ml-1"
+                  className="flex items-center gap-2 text-[#8A2BE2] font-bold text-lg touch-manipulation active:scale-95 transition-all min-h-[44px]"
                 >
-                  <ChevronLeft className="w-6 h-6 stroke-[3]" />
+                  <ChevronLeft className="w-7 h-7 stroke-[3]" />
                   <span>Back</span>
                 </button>
                 <button 
                   onClick={() => setShowTicketModal(false)}
-                  className="text-gray-700 hover:text-gray-900 transition-colors p-1.5 hover:bg-gray-100 rounded-full touch-manipulation active:scale-95"
+                  className="text-gray-900 transition-colors p-2 bg-gray-100 rounded-full touch-manipulation active:scale-95 min-h-[44px] min-w-[44px] flex items-center justify-center"
                 >
-                  <X className="w-6 h-6 stroke-[2.5]" />
+                  <X className="w-7 h-7 stroke-[3]" />
                 </button>
               </div>
               <div>
-                <h2 className="text-gray-900 text-xl font-semibold mb-0.5">Purchase Virtual Ticket</h2>
+                <h2 className="text-gray-900 text-xl font-bold mb-0.5">Purchase Virtual Ticket</h2>
                 <p className="text-gray-600 text-sm">{eventToPurchase.title}</p>
               </div>
             </div>
 
-            <div className="px-6 pb-6 pt-6">
+            <div className="px-6 pb-6 pt-6 overflow-y-auto flex-1">
             {/* Event Info */}
             <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 to-cyan-50 rounded-xl border border-purple-200">
               <div className="flex items-center gap-3 mb-3">
