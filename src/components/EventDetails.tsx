@@ -5920,8 +5920,8 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
 
       {/* Ticket Purchase Modal */}
       {showTicketModal && eventToPurchase && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTicketModal(false)}>
-          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setShowTicketModal(false)}>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl max-w-md w-full shadow-2xl max-h-[95vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             {/* Header with Navigation */}
             <div className="relative px-6 pt-5 pb-4 border-b border-gray-100">
               <div className="flex items-center justify-between mb-3">
