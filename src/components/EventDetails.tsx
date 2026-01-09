@@ -5922,30 +5922,30 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
       {showTicketModal && eventToPurchase && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowTicketModal(false)}>
           <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className="px-6 pt-6 pb-4">
-              <div className="flex items-center justify-between mb-4">
+            {/* Header with Navigation */}
+            <div className="relative px-6 pt-5 pb-4 border-b border-gray-100">
+              <div className="flex items-center justify-between mb-3">
                 <button 
                   onClick={() => setShowTicketModal(false)}
-                  className="text-purple-600 hover:text-purple-700 flex items-center gap-1.5 font-medium touch-manipulation active:scale-95 transition-transform"
+                  className="flex items-center gap-1.5 text-[#8A2BE2] hover:text-[#7020c0] font-semibold text-base touch-manipulation active:scale-95 transition-all -ml-1"
                 >
-                  <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
-                  <span className="text-sm">Back</span>
+                  <ChevronLeft className="w-6 h-6 stroke-[3]" />
+                  <span>Back</span>
                 </button>
                 <button 
                   onClick={() => setShowTicketModal(false)}
-                  className="text-gray-500 hover:text-gray-700 transition-colors p-2 -mr-2 touch-manipulation active:scale-95"
+                  className="text-gray-700 hover:text-gray-900 transition-colors p-1.5 hover:bg-gray-100 rounded-full touch-manipulation active:scale-95"
                 >
                   <X className="w-6 h-6 stroke-[2.5]" />
                 </button>
               </div>
               <div>
-                <h2 className="text-gray-900 text-2xl font-semibold mb-1">Purchase Virtual Ticket</h2>
+                <h2 className="text-gray-900 text-xl font-semibold mb-0.5">Purchase Virtual Ticket</h2>
                 <p className="text-gray-600 text-sm">{eventToPurchase.title}</p>
               </div>
             </div>
 
-            <div className="px-6 pb-6">
+            <div className="px-6 pb-6 pt-6">
             {/* Event Info */}
             <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 to-cyan-50 rounded-xl border border-purple-200">
               <div className="flex items-center gap-3 mb-3">

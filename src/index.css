@@ -985,6 +985,10 @@
     margin-bottom: calc(var(--spacing) * 20);
   }
 
+  .-ml-1 {
+    margin-left: calc(var(--spacing) * -1);
+  }
+
   .-ml-24 {
     margin-left: calc(var(--spacing) * -24);
   }
@@ -2881,6 +2885,10 @@
     stroke-width: 2.5px;
   }
 
+  .stroke-\[3\] {
+    stroke-width: 3px;
+  }
+
   .object-contain {
     object-fit: contain;
   }
@@ -4369,6 +4377,12 @@
   }
 
   @media (hover: hover) {
+    .hover\:text-\[\#7020c0\]:hover {
+      color: #7020c0;
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:text-\[\#7825d4\]:hover {
       color: #7825d4;
     }
@@ -4389,12 +4403,6 @@
   @media (hover: hover) {
     .hover\:text-gray-600:hover {
       color: var(--color-gray-600);
-    }
-  }
-
-  @media (hover: hover) {
-    .hover\:text-gray-700:hover {
-      color: var(--color-gray-700);
     }
   }
 
