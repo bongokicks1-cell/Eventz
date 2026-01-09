@@ -1,34 +1,3 @@
-import { 
-  Users, 
-  Calendar, 
-  Eye, 
-  DollarSign, 
-  TrendingUp, 
-  Video, 
-  Ticket, 
-  Radio,
-  Play,
-  BarChart3,
-  Clock,
-  MapPin,
-  Star,
-  PlusCircle,
-  Settings,
-  Share2,
-  Download,
-  Building2,
-  Heart,
-  MessageCircle,
-  MoreVertical,
-  Edit,
-  Trash2,
-  X,
-  ArrowUp,
-  ArrowDown,
-  Target,
-  Activity,
-  Send
-} from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { toast } from 'sonner@2.0.3';
 import organizerProfileImg from 'figma:asset/f341912f973a7295b54e9b5936a0020cb0975622.png';
@@ -36,6 +5,8 @@ import { useState, useEffect } from 'react';
 import { EventAnalyticsModal } from './EventAnalyticsModal';
 import { HighlightViewerModal } from './HighlightViewerModal';
 import { OrganizerSettingsModal } from './OrganizerSettingsModal';
+import { ShareModal } from './ShareModal';
+import { handleShare as shareUtil } from '../utils/share';
 
 interface OrganizerDashboardProps {
   onCreateEvent: () => void;
@@ -48,6 +19,8 @@ export function OrganizerDashboard({ onCreateEvent, onEditEvent }: OrganizerDash
   const [selectedEventForAnalytics, setSelectedEventForAnalytics] = useState<any>(null);
   const [selectedHighlight, setSelectedHighlight] = useState<any>(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareModalData, setShareModalData] = useState<{ title: string; text: string; url?: string } | null>(null);
 
   // Load published events from localStorage
   useEffect(() => {
@@ -162,10 +135,22 @@ export function OrganizerDashboard({ onCreateEvent, onEditEvent }: OrganizerDash
     }
   ];
 
-  const handleShare = (highlight: typeof highlights[0]) => {
-    toast.success('Share link copied!', {
-      description: `"${highlight.title}" is ready to share`
+  const handleShare = async (highlight: typeof highlights[0]) => {
+    const shared = await shareUtil({
+      title: highlight.title,
+      text: `Check out this highlight from my event!`,
+      url: window.location.href,
     });
+    
+    // If native share not available, show custom modal
+    if (!shared) {
+      setShareModalData({
+        title: highlight.title,
+        text: 'Check out this highlight from my event!',
+        url: window.location.href,
+      });
+      setShowShareModal(true);
+    }
   };
 
   const handleLike = (highlightId: number) => {
@@ -662,6 +647,20 @@ export function OrganizerDashboard({ onCreateEvent, onEditEvent }: OrganizerDash
       {showSettings && (
         <OrganizerSettingsModal
           onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {/* Share Modal */}
+      {shareModalData && (
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => {
+            setShowShareModal(false);
+            setShareModalData(null);
+          }}
+          title={shareModalData.title}
+          text={shareModalData.text}
+          url={shareModalData.url}
         />
       )}
     </div>

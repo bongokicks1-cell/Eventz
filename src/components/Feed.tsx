@@ -4,6 +4,8 @@ import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ti
 import { toast } from 'sonner@2.0.3';
 import { UserProfileModal } from './UserProfileModal';
 import { Conversation, Message } from '../App';
+import { ShareModal } from './ShareModal';
+import { handleShare } from '../utils/share';
 
 interface Comment {
   id: number;
@@ -445,6 +447,8 @@ export function Feed({ conversations: globalConversations, onStartConversation, 
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
   const [messageText, setMessageText] = useState('');
   const [selectedUserProfile, setSelectedUserProfile] = useState<{ name: string; username: string; avatar: string; verified: boolean; isOrganizer?: boolean } | null>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareModalData, setShareModalData] = useState<{ title: string; text: string; url?: string } | null>(null);
   const [messageSearch, setMessageSearch] = useState('');
   const [likeAnimation, setLikeAnimation] = useState<{ show: boolean; x: number; y: number }>({ show: false, x: 0, y: 0 });
   const [lastTap, setLastTap] = useState<number>(0);
@@ -537,9 +541,24 @@ export function Feed({ conversations: globalConversations, onStartConversation, 
     }
   };
 
-  const sharePost = (post: Post, e?: React.MouseEvent) => {
+  const sharePost = async (post: Post, e?: React.MouseEvent) => {
     e?.stopPropagation();
-    toast.success('Link copied! Share with friends 🎉');
+    
+    const shared = await handleShare({
+      title: `Check out this post from ${post.user.name}`,
+      text: post.content || 'Check out this amazing post on EVENTZ!',
+      url: window.location.href,
+    });
+    
+    // If native share not available, show custom modal
+    if (!shared) {
+      setShareModalData({
+        title: `Post from ${post.user.name}`,
+        text: post.content || 'Check out this amazing post on EVENTZ!',
+        url: window.location.href,
+      });
+      setShowShareModal(true);
+    }
   };
 
   const openPostDetail = (post: Post) => {
@@ -2156,6 +2175,20 @@ export function Feed({ conversations: globalConversations, onStartConversation, 
             handleStartConversationLocal(selectedUserProfile);
             setSelectedUserProfile(null);
           }}
+        />
+      )}
+
+      {/* Share Modal */}
+      {shareModalData && (
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => {
+            setShowShareModal(false);
+            setShareModalData(null);
+          }}
+          title={shareModalData.title}
+          text={shareModalData.text}
+          url={shareModalData.url}
         />
       )}
     </>

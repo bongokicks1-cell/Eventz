@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { X, Lock, Users, Heart, MessageCircle, Send, Volume2, VolumeX, Maximize, MoreVertical, Share2 } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { ShareModal } from './ShareModal';
+import { handleShare as shareUtil } from '../utils/share';
 
 interface LiveStreamViewerProps {
   stream: {
@@ -38,6 +40,7 @@ export function LiveStreamViewer({ stream, onClose, isUnlockedOverride }: LiveSt
   const [reactions, setReactions] = useState(0);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   useEffect(() => {
     if (chatEndRef.current) {
@@ -100,8 +103,17 @@ export function LiveStreamViewer({ stream, onClose, isUnlockedOverride }: LiveSt
     setTimeout(() => setReactions(prev => Math.max(0, prev - 1)), 2000);
   };
 
-  const handleShare = () => {
-    toast.success('Share link copied to clipboard!');
+  const handleShare = async () => {
+    const shared = await shareUtil({
+      title: stream.title,
+      text: `Watch ${stream.title} live on EVENTZ!\nViewing now: ${stream.viewers} people`,
+      url: window.location.href,
+    });
+    
+    // If native share not available, show custom modal
+    if (!shared) {
+      setShowShareModal(true);
+    }
   };
 
   // Get appropriate video URL based on stream content
@@ -368,6 +380,15 @@ export function LiveStreamViewer({ stream, onClose, isUnlockedOverride }: LiveSt
           animation: float-up 2s ease-out forwards;
         }
       `}</style>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={stream.title}
+        text={`Watch ${stream.title} live on EVENTZ!\nViewing now: ${stream.viewers} people`}
+        url={window.location.href}
+      />
     </div>
   );
 }

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Upload, Calendar, MapPin, DollarSign, Tag, Eye, Save, Music, GraduationCap, Church, Briefcase, Dumbbell, Palette, CheckCircle, Building2, ArrowLeft, Sparkles, Share2, TrendingUp, Users, BarChart3, X } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { ShareModal } from './ShareModal';
+import { handleShare as shareUtil } from '../utils/share';
 
 interface EventForm {
   title: string;
@@ -35,6 +37,7 @@ export function CreateEvent({ onBack, event }: CreateEventProps) {
 
   const [showPreview, setShowPreview] = useState(false);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const isEditing = !!event;
 
   // Get organizer profile from localStorage
@@ -266,8 +269,17 @@ export function CreateEvent({ onBack, event }: CreateEventProps) {
           {/* Action Buttons */}
           <div className="grid grid-cols-2 gap-4">
             <button
-              onClick={() => {
-                toast.success('Event link copied! 📋');
+              onClick={async () => {
+                const shared = await shareUtil({
+                  title: formData.title,
+                  text: `${formData.date} at ${formData.location}\nPrice: ${formData.price}`,
+                  url: window.location.href,
+                });
+                
+                // If native share not available, show custom modal
+                if (!shared) {
+                  setShowShareModal(true);
+                }
               }}
               className="flex items-center justify-center gap-2 px-6 py-4 bg-white border-2 border-purple-600 text-purple-600 rounded-xl hover:bg-purple-50 transition-all"
             >
@@ -559,6 +571,15 @@ export function CreateEvent({ onBack, event }: CreateEventProps) {
           </button>
         </div>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={formData.title}
+        text={`${formData.date} at ${formData.location}\nPrice: ${formData.price}`}
+        url={window.location.href}
+      />
     </div>
   );
 }

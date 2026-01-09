@@ -635,10 +635,6 @@
     top: calc(var(--spacing) * 6);
   }
 
-  .top-full {
-    top: 100%;
-  }
-
   .-right-0\.5 {
     right: calc(var(--spacing) * -.5);
   }
@@ -1333,10 +1329,6 @@
 
   .w-48 {
     width: calc(var(--spacing) * 48);
-  }
-
-  .w-56 {
-    width: calc(var(--spacing) * 56);
   }
 
   .w-64 {
@@ -3765,10 +3757,6 @@
     --tw-enter-translate-y: 100%;
   }
 
-  .slide-in-from-top-2 {
-    --tw-enter-translate-y: calc(2 * var(--spacing) * -1);
-  }
-
   @media (hover: hover) {
     .group-hover\:-translate-x-1:is(:where(.group):hover *) {
       --tw-translate-x: calc(var(--spacing) * -1);
@@ -4596,6 +4584,12 @@
   @media (width >= 40rem) {
     .sm\:inline {
       display: inline;
+    }
+  }
+
+  @media (width >= 40rem) {
+    .sm\:h-2 {
+      height: calc(var(--spacing) * 2);
     }
   }
 

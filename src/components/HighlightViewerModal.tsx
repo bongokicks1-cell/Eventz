@@ -1,6 +1,8 @@
 import { X, Heart, MessageCircle, Share2, Send, Clock } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useState } from 'react';
+import { ShareModal } from './ShareModal';
+import { handleShare } from '../utils/share';
 import { toast } from 'sonner@2.0.3';
 
 interface HighlightViewerModalProps {
@@ -27,6 +29,7 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
   const [isLiked, setIsLiked] = useState(highlight.isLiked);
   const [likes, setLikes] = useState(highlight.likes);
   const [commentText, setCommentText] = useState('');
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const mockComments = [
     {
@@ -136,7 +139,20 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
                 </div>
               </div>
               <button
-                onClick={() => onShare(highlight)}
+                onClick={async () => {
+                  const shared = await handleShare({
+                    title: highlight.title,
+                    text: 'Check out this amazing highlight on EVENTZ!',
+                    url: window.location.href,
+                  });
+                  
+                  // If native share not available, show custom modal
+                  if (!shared) {
+                    setShowShareModal(true);
+                  } else {
+                    onShare(highlight);
+                  }
+                }}
                 className="flex items-center gap-2 text-gray-600 hover:text-[#8A2BE2] transition-colors"
               >
                 <Share2 className="w-6 h-6" />
@@ -190,6 +206,15 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
           </div>
         </div>
       </div>
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={highlight.title}
+        text="Check out this amazing highlight on EVENTZ!"
+        url={window.location.href}
+      />
     </div>
   );
 }

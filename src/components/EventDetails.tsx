@@ -9,6 +9,8 @@ import { UserProfileModal } from './UserProfileModal';
 import { SetAlertModal } from './SetAlertModal';
 import { TierTicketModal } from './TierTicketModal';
 import { MediaViewer } from './MediaViewer';
+import { ShareModal } from './ShareModal';
+import { handleShare } from '../utils/share';
 import harmonizePoster from 'figma:asset/7b5f7bc419019da4329ccbf3dd742620e8e20c43.png';
 import hennessyPoster from 'figma:asset/86729da933e180c2188b5a326ae17c48bda85b9d.png';
 import vintageSpacePoster from 'figma:asset/95b9c37c292bb18313f0eb859f9f372fdc547d97.png';
@@ -4531,8 +4533,7 @@ const attendeeImages = [
 function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurchaseNormalTicket, onStartConversation }: EventDetailModalProps) {
   const [isSaved, setIsSaved] = useState(event.isSaved || false);
   const [showOrganizerProfile, setShowOrganizerProfile] = useState(false);
-  const [showShareMenu, setShowShareMenu] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [showMediaViewer, setShowMediaViewer] = useState(false);
   const [mediaViewerIndex, setMediaViewerIndex] = useState(0);
@@ -4601,48 +4602,23 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
 
 
 
-  // Share functions
-  const handleShareWhatsApp = () => {
-    const eventUrl = window.location.href;
-    const text = `Check out ${event.title} on EVENTZ!\n${event.date} at ${event.location}\n${eventUrl}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
-    setShowShareMenu(false);
-  };
-
-  const handleShareEmail = () => {
-    const eventUrl = window.location.href;
-    const subject = `Check out ${event.title} on EVENTZ`;
-    const body = `I thought you might be interested in this event:\n\n${event.title}\n${event.date}\n${event.location}\n\nPrice: ${event.price}\n\n${event.description}\n\nView event: ${eventUrl}`;
-    window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    setShowShareMenu(false);
-  };
-
-  const handleCopyLink = async () => {
-    const eventUrl = window.location.href;
-    try {
-      await navigator.clipboard.writeText(eventUrl);
-      setLinkCopied(true);
-      setTimeout(() => {
-        setLinkCopied(false);
-        setShowShareMenu(false);
-      }, 2000);
-    } catch (err) {
-      console.error('Failed to copy link:', err);
+  // Share function - uses native share API or fallback modal
+  const handleShareEvent = async () => {
+    const shared = await handleShare({
+      title: event.title,
+      text: `${event.date} at ${event.location}\nPrice: ${event.price}`,
+      url: window.location.href,
+    });
+    
+    // If native share not available, show custom modal
+    if (!shared) {
+      setShowShareModal(true);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in" onClick={onClose}>
-      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl animate-in slide-in-from-bottom max-h-[95vh] overflow-y-auto" onClick={(e) => {
-        e.stopPropagation();
-        // Close share menu when clicking outside of it
-        if (showShareMenu) {
-          const target = e.target as HTMLElement;
-          if (!target.closest('.share-menu-container')) {
-            setShowShareMenu(false);
-          }
-        }
-      }}>
+      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl animate-in slide-in-from-bottom max-h-[95vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         {/* Cover Image with Overlays */}
         <div className="relative w-full h-96">
           <ImageWithFallback
@@ -4704,69 +4680,13 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
                 >
                   <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-purple-600' : ''}`} />
                 </button>
-                <div className="relative share-menu-container">
-                  <button 
-                    onClick={() => setShowShareMenu(!showShareMenu)}
-                    className="p-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                    title="Share event"
-                  >
-                    <Share2 className="w-4 h-4" />
-                  </button>
-                  
-                  {/* Share Menu Dropdown */}
-                  {showShareMenu && (
-                    <div className="absolute right-0 top-full mt-2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
-                      <div className="p-2">
-                        <button
-                          onClick={handleShareWhatsApp}
-                          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
-                        >
-                          <div className="w-9 h-9 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0">
-                            <MessageCircle className="w-4 h-4 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-gray-900 text-sm">WhatsApp</p>
-                            <p className="text-gray-500 text-xs">Share via WhatsApp</p>
-                          </div>
-                        </button>
-                        
-                        <button
-                          onClick={handleShareEmail}
-                          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
-                        >
-                          <div className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
-                            <Mail className="w-4 h-4 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-gray-900 text-sm">Email</p>
-                            <p className="text-gray-500 text-xs">Share via email</p>
-                          </div>
-                        </button>
-                        
-                        <button
-                          onClick={handleCopyLink}
-                          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-left"
-                        >
-                          <div className="w-9 h-9 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
-                            {linkCopied ? (
-                              <Check className="w-4 h-4 text-white" />
-                            ) : (
-                              <Copy className="w-4 h-4 text-white" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-gray-900 text-sm">
-                              {linkCopied ? 'Link Copied!' : 'Copy Link'}
-                            </p>
-                            <p className="text-gray-500 text-xs">
-                              {linkCopied ? 'Paste anywhere' : 'Copy event link'}
-                            </p>
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <button 
+                  onClick={handleShareEvent}
+                  className="p-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  title="Share event"
+                >
+                  <Share2 className="w-4 h-4" />
+                </button>
               </div>
             </div>
           </div>
@@ -5049,6 +4969,15 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
             type={mediaViewerType}
           />
         )}
+
+        {/* Share Modal */}
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          title={event.title}
+          text={`${event.date} at ${event.location}\nPrice: ${event.price}`}
+          url={window.location.href}
+        />
       </div>
     </div>
   );

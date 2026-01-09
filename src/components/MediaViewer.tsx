@@ -1,6 +1,8 @@
 import { X, Heart, Share2, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useState, useEffect, useRef } from 'react';
+import { ShareModal } from './ShareModal';
+import { handleShare as shareUtil } from '../utils/share';
 import { toast } from 'sonner@2.0.3';
 
 interface Photo {
@@ -37,6 +39,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
   const [fullscreenAvailable, setFullscreenAvailable] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const currentMedia = media[currentIndex];
 
@@ -119,11 +122,21 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
     }
   };
 
-  const handleShare = () => {
-    toast.success('Link copied to clipboard! 🔗', {
-      description: 'Share this amazing moment with friends',
-      duration: 2000,
+  const handleShare = async () => {
+    const title = type === 'photo' 
+      ? `Photo from ${(currentMedia as Photo).eventName}` 
+      : `Video from Event`;
+    
+    const shared = await shareUtil({
+      title,
+      text: 'Check out this amazing moment on EVENTZ!',
+      url: window.location.href,
     });
+    
+    // If native share not available, show custom modal
+    if (!shared) {
+      setShowShareModal(true);
+    }
   };
 
   const togglePlayPause = () => {
@@ -414,6 +427,17 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
           display: none;
         }
       `}} />
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={type === 'photo' 
+          ? `Photo from ${(currentMedia as Photo).eventName}` 
+          : `Video from Event`}
+        text="Check out this amazing moment on EVENTZ!"
+        url={window.location.href}
+      />
     </div>
   );
 }
