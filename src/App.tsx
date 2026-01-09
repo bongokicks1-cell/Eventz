@@ -13,7 +13,6 @@ import { PWAStatusIndicator } from './components/PWAStatusIndicator';
 import { PWADebugInfo } from './components/PWADebugInfo';
 import { Calendar, Radio, PlusCircle, Bell, User, Rss } from 'lucide-react';
 import { Toaster } from 'sonner@2.0.3';
-import { registerServiceWorker } from './utils/registerSW';
 
 type Tab = 'event' | 'feed' | 'live' | 'create' | 'profile';
 type OrganizerView = 'dashboard' | 'createEvent';
@@ -268,10 +267,6 @@ export default function App() {
     setPurchasedTickets(updatedTickets);
     localStorage.setItem('eventz-purchased-tickets', JSON.stringify(updatedTickets));
   };
-
-  useEffect(() => {
-    registerServiceWorker();
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
