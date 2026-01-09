@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { EventDetails } from './components/EventDetails';
 import { LiveFeed } from './components/LiveFeed';
 import { Feed } from './components/Feed';
@@ -8,8 +8,11 @@ import { OrganizerProfileSetup } from './components/OrganizerProfileSetup';
 import { OrganizerDashboard } from './components/OrganizerDashboard';
 import { Notifications } from './components/Notifications';
 import { Profile } from './components/Profile';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { PWAStatusIndicator } from './components/PWAStatusIndicator';
 import { Calendar, Radio, PlusCircle, Bell, User, Rss } from 'lucide-react';
 import { Toaster } from 'sonner@2.0.3';
+import { registerServiceWorker } from './utils/registerSW';
 
 type Tab = 'event' | 'feed' | 'live' | 'create' | 'profile';
 type OrganizerView = 'dashboard' | 'createEvent';
@@ -265,6 +268,10 @@ export default function App() {
     localStorage.setItem('eventz-purchased-tickets', JSON.stringify(updatedTickets));
   };
 
+  useEffect(() => {
+    registerServiceWorker();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Toaster 
@@ -352,6 +359,8 @@ export default function App() {
           </div>
         </div>
       </nav>
+      <PWAInstallPrompt />
+      <PWAStatusIndicator />
     </div>
   );
 }

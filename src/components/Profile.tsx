@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { Settings, MapPin, Calendar, Video, Edit2, Bookmark, X, Sparkles, Play, Heart, Ticket, Bell, BellOff, Camera, Image as ImageIcon, Upload, Plus, Smile } from 'lucide-react';
+import { Settings, MapPin, Calendar, Video, Edit2, Bookmark, X, Sparkles, Play, Heart, Ticket, Bell, BellOff, Camera, Image as ImageIcon, Upload, Plus, Smile, Smartphone } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 import { SettingsModal } from './SettingsModal';
 import { MediaViewer } from './MediaViewer';
 import { TicketViewer } from './TicketViewer';
+import { PWAFeaturesOverview } from './PWAFeaturesOverview';
 
 interface Event {
   id: number;
@@ -65,9 +66,13 @@ const attendedEvents: Event[] = [
     id: 3,
     name: 'Rooftop Party Experience',
     date: 'Jun 16, 2025',
+    time: '9:00 PM',
     location: 'Arusha',
     category: 'Party',
     image: 'https://images.unsplash.com/photo-1692275964898-922a80aaf398?w=400&h=300&fit=crop',
+    ticketType: 'General Admission',
+    price: 'TZS 10,000',
+    qrCode: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&h=400&fit=crop',
   },
   {
     id: 4,
@@ -412,6 +417,7 @@ export function Profile({ conversations, onStartConversation, onSendMessage }: P
   const [showTicketViewer, setShowTicketViewer] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<TicketEvent | null>(null);
   const [showAllEvents, setShowAllEvents] = useState(false);
+  const [showPWAFeatures, setShowPWAFeatures] = useState(false);
 
   // Load saved events from localStorage
   useEffect(() => {
@@ -991,14 +997,34 @@ export function Profile({ conversations, onStartConversation, onSendMessage }: P
         />
       )}
 
-      {/* Floating Action Button - Share Post */}
-      <button
-        onClick={() => setShowSharePostModal(true)}
-        className="fixed bottom-24 right-6 w-16 h-16 rounded-full bg-[#8A2BE2] shadow-2xl hover:shadow-purple-500/50 hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center z-40 group"
-        title="Share a post"
-      >
-        <Camera className="w-7 h-7 text-white group-hover:rotate-12 transition-transform" />
-      </button>
+      {/* PWA Features Overview */}
+      {showPWAFeatures && (
+        <PWAFeaturesOverview
+          isOpen={showPWAFeatures}
+          onClose={() => setShowPWAFeatures(false)}
+        />
+      )}
+
+      {/* Floating Action Buttons */}
+      <div className="fixed bottom-24 right-6 flex flex-col gap-3 z-40">
+        {/* PWA Info Button */}
+        <button
+          onClick={() => setShowPWAFeatures(true)}
+          className="w-14 h-14 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 shadow-xl hover:shadow-cyan-500/50 hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center group"
+          title="Progressive Web App Features"
+        >
+          <Smartphone className="w-6 h-6 text-white group-hover:rotate-12 transition-transform" />
+        </button>
+
+        {/* Share Post Button */}
+        <button
+          onClick={() => setShowSharePostModal(true)}
+          className="w-16 h-16 rounded-full bg-[#8A2BE2] shadow-2xl hover:shadow-purple-500/50 hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center group"
+          title="Share a post"
+        >
+          <Camera className="w-7 h-7 text-white group-hover:rotate-12 transition-transform" />
+        </button>
+      </div>
 
       {/* Share Post Modal */}
       {showSharePostModal && (
