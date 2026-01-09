@@ -29,6 +29,121 @@ export interface PurchasedTicket {
   ticketType?: 'Normal' | 'VIP' | 'VVIP';
 }
 
+// Global messaging interfaces
+export interface Message {
+  id: number;
+  senderId: number;
+  text: string;
+  timestamp: string;
+  read: boolean;
+}
+
+export interface Conversation {
+  id: number;
+  user: {
+    name: string;
+    username: string;
+    avatar: string;
+    verified: boolean;
+    isOrganizer?: boolean;
+  };
+  lastMessage: {
+    text: string;
+    timestamp: string;
+    isRead: boolean;
+  };
+  unreadCount: number;
+  messages: Message[];
+}
+
+// Mock conversations data
+const initialConversations: Conversation[] = [
+  {
+    id: 1,
+    user: {
+      name: 'Jazz Events TZ',
+      username: '@jazzeventstz',
+      avatar: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100&h=100&fit=crop',
+      verified: true,
+      isOrganizer: true,
+    },
+    lastMessage: {
+      text: 'Thank you for attending! Hope you enjoyed the show 🎷',
+      timestamp: '5m ago',
+      isRead: false,
+    },
+    unreadCount: 2,
+    messages: [
+      { id: 1, senderId: 1, text: 'Hey! Thanks for getting tickets to Jazz Night!', timestamp: '2:30 PM', read: true },
+      { id: 2, senderId: 0, text: 'Can\'t wait! What time does it start?', timestamp: '2:32 PM', read: true },
+      { id: 3, senderId: 1, text: 'Doors open at 7 PM, show starts at 8 PM sharp!', timestamp: '2:35 PM', read: true },
+      { id: 4, senderId: 1, text: 'Thank you for attending! Hope you enjoyed the show 🎷', timestamp: '10:45 PM', read: false },
+    ],
+  },
+  {
+    id: 2,
+    user: {
+      name: 'Sarah Mitchell',
+      username: '@sarahmitchell',
+      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
+      verified: false,
+    },
+    lastMessage: {
+      text: 'Are you going to the Amapiano Festival this weekend?',
+      timestamp: '1h ago',
+      isRead: true,
+    },
+    unreadCount: 0,
+    messages: [
+      { id: 1, senderId: 2, text: 'Hey! Saw you at the concert last night!', timestamp: 'Yesterday', read: true },
+      { id: 2, senderId: 0, text: 'Yes! It was amazing! 🎶', timestamp: 'Yesterday', read: true },
+      { id: 3, senderId: 2, text: 'Are you going to the Amapiano Festival this weekend?', timestamp: '1h ago', read: true },
+    ],
+  },
+  {
+    id: 3,
+    user: {
+      name: 'Dar Live Events',
+      username: '@darliveevents',
+      avatar: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=100&h=100&fit=crop',
+      verified: true,
+      isOrganizer: true,
+    },
+    lastMessage: {
+      text: 'Your VIP tickets have been confirmed! 🎫',
+      timestamp: '3h ago',
+      isRead: true,
+    },
+    unreadCount: 0,
+    messages: [
+      { id: 1, senderId: 3, text: 'Hi! We noticed you\'re interested in VIP packages', timestamp: '5:20 PM', read: true },
+      { id: 2, senderId: 0, text: 'Yes! What\'s included in the VIP package?', timestamp: '5:25 PM', read: true },
+      { id: 3, senderId: 3, text: 'Front row seats, meet & greet, and exclusive merch!', timestamp: '5:27 PM', read: true },
+      { id: 4, senderId: 3, text: 'Your VIP tickets have been confirmed! 🎫', timestamp: '6:15 PM', read: true },
+    ],
+  },
+  {
+    id: 4,
+    user: {
+      name: 'Marcus Rodriguez',
+      username: '@marcusrodriguez',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
+      verified: false,
+    },
+    lastMessage: {
+      text: 'Let me know if you need a ride to the venue',
+      timestamp: '1d ago',
+      isRead: true,
+    },
+    unreadCount: 0,
+    messages: [
+      { id: 1, senderId: 4, text: 'Yo! Got my tickets for Friday!', timestamp: 'Mon', read: true },
+      { id: 2, senderId: 0, text: 'Nice! Me too! 🔥', timestamp: 'Mon', read: true },
+      { id: 3, senderId: 4, text: 'Let me know if you need a ride to the venue', timestamp: 'Tue', read: true },
+    ],
+  },
+];
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<Tab>('event');
   const [isOrganizer, setIsOrganizer] = useState(() => {
@@ -48,6 +163,77 @@ export default function App() {
     const saved = localStorage.getItem('eventz-purchased-tickets');
     return saved ? JSON.parse(saved) : [];
   });
+
+  // Global messaging state
+  const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
+
+  // Handler to start or continue a conversation
+  const handleStartConversation = (user: { name: string; username?: string; avatar: string; verified: boolean; isOrganizer?: boolean }) => {
+    // Check if conversation already exists (match by username first, then name - case insensitive)
+    const existingConv = conversations.find(conv => {
+      // If both have username, match by username (case-insensitive)
+      if (conv.user.username && user.username) {
+        return conv.user.username.toLowerCase().trim() === user.username.toLowerCase().trim();
+      }
+      // Otherwise match by name (case-insensitive, trimmed)
+      return conv.user.name.toLowerCase().trim() === user.name.toLowerCase().trim();
+    });
+    
+    if (existingConv) {
+      // Return existing conversation
+      return existingConv;
+    } else {
+      // Create new conversation
+      const newConversation: Conversation = {
+        id: Date.now(),
+        user: {
+          name: user.name,
+          username: user.username || `@${user.name.toLowerCase().replace(/\s+/g, '')}`,
+          avatar: user.avatar,
+          verified: user.verified,
+          isOrganizer: user.isOrganizer,
+        },
+        lastMessage: {
+          text: 'Start a conversation...',
+          timestamp: 'Now',
+          isRead: true,
+        },
+        unreadCount: 0,
+        messages: [],
+      };
+      
+      setConversations([newConversation, ...conversations]);
+      return newConversation;
+    }
+  };
+
+  // Handler to send a message
+  const handleSendMessage = (conversationId: number, messageText: string) => {
+    if (!messageText.trim()) return;
+
+    const newMessage: Message = {
+      id: Date.now(),
+      senderId: 0, // Current user
+      text: messageText.trim(),
+      timestamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
+      read: true,
+    };
+
+    setConversations(conversations.map(conv => {
+      if (conv.id === conversationId) {
+        return {
+          ...conv,
+          messages: [...conv.messages, newMessage],
+          lastMessage: {
+            text: newMessage.text,
+            timestamp: 'Just now',
+            isRead: true,
+          },
+        };
+      }
+      return conv;
+    }));
+  };
 
   const handleBecomeOrganizer = () => {
     setIsOrganizer(true);
@@ -95,8 +281,8 @@ export default function App() {
       />
       {/* Main Content */}
       <div className="max-w-7xl mx-auto pb-20">
-        {activeTab === 'event' && <EventDetails onTicketPurchase={handleTicketPurchase} purchasedTickets={purchasedTickets} />}
-        {activeTab === 'feed' && <Feed />}
+        {activeTab === 'event' && <EventDetails onTicketPurchase={handleTicketPurchase} purchasedTickets={purchasedTickets} conversations={conversations} onStartConversation={handleStartConversation} onSendMessage={handleSendMessage} />}
+        {activeTab === 'feed' && <Feed conversations={conversations} onStartConversation={handleStartConversation} onSendMessage={handleSendMessage} />}
         {activeTab === 'live' && <LiveFeed />}
         {activeTab === 'create' && (
           !isOrganizer ? (
@@ -109,7 +295,7 @@ export default function App() {
             <CreateEvent onBack={handleBackToDashboard} event={editingEvent} />
           )
         )}
-        {activeTab === 'profile' && <Profile />}
+        {activeTab === 'profile' && <Profile conversations={conversations} onStartConversation={handleStartConversation} onSendMessage={handleSendMessage} />}
       </div>
 
       {/* Bottom Navigation */}

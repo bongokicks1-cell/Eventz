@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { MapPin, Calendar, DollarSign, Share2, Bookmark, Users, ChevronRight, ChevronLeft, Clock, X, Filter, Radio, Tv, Play, Eye, CheckCircle2, Search, MoreVertical, Mail, MessageCircle, Copy, Check, Bell, Send } from 'lucide-react';
+import { MapPin, Calendar, DollarSign, Share2, Bookmark, Users, ChevronRight, ChevronLeft, Clock, X, Filter, Radio, Tv, Play, Eye, CheckCircle2, Search, MoreVertical, Mail, MessageCircle, Copy, Check, Bell, Send, Star } from 'lucide-react';
 import { OrganizerProfile } from './OrganizerProfile';
 import { toast } from 'sonner@2.0.3';
-import { PurchasedTicket } from '../App';
+import { PurchasedTicket, Conversation, Message } from '../App';
 import { PremiumSearchModal } from './PremiumSearchModal';
 import { UserProfileModal } from './UserProfileModal';
 import { SetAlertModal } from './SetAlertModal';
@@ -14,32 +14,6 @@ import hennessyPoster from 'figma:asset/86729da933e180c2188b5a326ae17c48bda85b9d
 import vintageSpacePoster from 'figma:asset/95b9c37c292bb18313f0eb859f9f372fdc547d97.png';
 import bukiJenardCover from 'figma:asset/84bca774e8638978da6b9a5588dd8ef8481492a4.png';
 import luchyRanksCover from 'figma:asset/8ec3165de81ea3f3c210518a2ea2c83f98b3b9ac.png';
-
-interface Message {
-  id: number;
-  senderId: number;
-  text: string;
-  timestamp: string;
-  read: boolean;
-}
-
-interface Conversation {
-  id: number;
-  user: {
-    name: string;
-    username?: string;
-    avatar: string;
-    verified: boolean;
-    isOrganizer?: boolean;
-  };
-  lastMessage: {
-    text: string;
-    timestamp: string;
-    isRead: boolean;
-  };
-  unreadCount: number;
-  messages: Message[];
-}
 
 interface Event {
   id: number;
@@ -5083,9 +5057,12 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
 interface EventDetailsProps {
   onTicketPurchase: (ticket: PurchasedTicket) => void;
   purchasedTickets: PurchasedTicket[];
+  conversations: Conversation[];
+  onStartConversation: (user: { name: string; username?: string; avatar: string; verified: boolean; isOrganizer?: boolean }) => Conversation;
+  onSendMessage: (conversationId: number, messageText: string) => void;
 }
 
-export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetailsProps) {
+export function EventDetails({ onTicketPurchase, purchasedTickets, conversations: globalConversations, onStartConversation, onSendMessage }: EventDetailsProps) {
   const [selectedLocation, setSelectedLocation] = useState('all');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
@@ -5112,7 +5089,6 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
   
   // Messaging state
   const [showMessages, setShowMessages] = useState(false);
-  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
   const [messageText, setMessageText] = useState('');
 
@@ -5155,64 +5131,46 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
     videoUrl: highlight.video!,
   })) || [];
 
-  const handleStartConversation = (user: { name: string; username?: string; avatar: string; verified: boolean; isOrganizer?: boolean }) => {
+  const handleStartConversationLocal = (user: { name: string; username?: string; avatar: string; verified: boolean; isOrganizer?: boolean }) => {
     // Close user profile modal
     setSelectedUser(null);
     
-    // Check if conversation already exists
-    const existingConv = conversations.find(conv => conv.user.name === user.name);
+    // Use the global conversation handler
+    const conversation = onStartConversation(user);
     
-    if (existingConv) {
-      // Open existing conversation
-      setActiveConversation(existingConv);
-      setShowMessages(true);
-    } else {
-      // Create new conversation
-      const newConversation: Conversation = {
-        id: Date.now(),
-        user: user,
-        lastMessage: {
-          text: 'Start a conversation...',
-          timestamp: 'Now',
-          isRead: true,
-        },
-        unreadCount: 0,
-        messages: [],
-      };
-      
-      setConversations([newConversation, ...conversations]);
-      setActiveConversation(newConversation);
-      setShowMessages(true);
-    }
+    // Open the conversation
+    setActiveConversation(conversation);
+    setShowMessages(true);
   };
 
   const handleSendMessage = () => {
     if (!messageText.trim() || !activeConversation) return;
 
+    // Create the new message object for optimistic update
     const newMessage: Message = {
       id: Date.now(),
-      senderId: 0, // Current user
-      text: messageText,
+      senderId: 0,
+      text: messageText.trim(),
       timestamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
       read: true,
     };
 
-    // Update conversation
+    // Optimistically update local active conversation
     const updatedConversation = {
       ...activeConversation,
       messages: [...activeConversation.messages, newMessage],
       lastMessage: {
-        text: messageText,
-        timestamp: 'Now',
+        text: newMessage.text,
+        timestamp: 'Just now',
         isRead: true,
       },
     };
-
     setActiveConversation(updatedConversation);
-    setConversations(conversations.map(conv => 
-      conv.id === activeConversation.id ? updatedConversation : conv
-    ));
 
+    // Update the global state
+    onSendMessage(activeConversation.id, messageText);
+
+    // Clear the input field
     setMessageText('');
   };
 
@@ -5943,7 +5901,7 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
             toast.success(`You are now following ${selectedUser.name}!`);
           }}
           onMessage={() => {
-            handleStartConversation(selectedUser);
+            handleStartConversationLocal(selectedUser);
           }}
         />
       )}
@@ -5956,7 +5914,7 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
           hasTicket={hasTicket}
           onPurchaseTicket={handlePurchaseTicket}
           onPurchaseNormalTicket={handleNormalTicketPurchase}
-          onStartConversation={handleStartConversation}
+          onStartConversation={handleStartConversationLocal}
         />
       )}
 
@@ -6353,14 +6311,14 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
 
                 {/* Conversations List */}
                 <div className="flex-1 overflow-y-auto">
-                  {conversations.length === 0 ? (
+                  {globalConversations.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full p-8 text-center">
                       <MessageCircle className="w-16 h-16 text-gray-300 mb-4" />
                       <h3 className="text-gray-900 mb-2">No messages yet</h3>
                       <p className="text-gray-500 text-sm">Start a conversation with organizers or other users!</p>
                     </div>
                   ) : (
-                    conversations.map((conv) => (
+                    globalConversations.map((conv) => (
                       <button
                         key={conv.id}
                         onClick={() => setActiveConversation(conv)}
@@ -6399,73 +6357,98 @@ export function EventDetails({ onTicketPurchase, purchasedTickets }: EventDetail
               </>
             ) : (
               <>
-                {/* Active Conversation Header */}
-                <div className="p-4 border-b border-gray-200 flex items-center gap-3">
-                  <button
-                    onClick={() => setActiveConversation(null)}
-                    className="text-gray-600 hover:text-gray-900"
-                  >
-                    <ChevronLeft className="w-6 h-6" />
-                  </button>
-                  <div className="flex items-center gap-3 flex-1">
-                    <ImageWithFallback
-                      src={activeConversation.user.avatar}
-                      alt={activeConversation.user.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-1">
-                        <span className="text-gray-900 font-medium">{activeConversation.user.name}</span>
-                        {activeConversation.user.verified && (
-                          <CheckCircle2 className="w-4 h-4 text-white fill-[#8A2BE2]" />
-                        )}
-                      </div>
-                      {activeConversation.user.username && (
-                        <p className="text-gray-500 text-xs">{activeConversation.user.username}</p>
+                {/* Active Conversation Header - Purple Gradient */}
+                <div className="bg-[#8A2BE2] px-5 py-4">
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setActiveConversation(null)}
+                      className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-white" />
+                    </button>
+                    
+                    <div className="relative">
+                      <ImageWithFallback
+                        src={activeConversation.user.avatar}
+                        alt={activeConversation.user.name}
+                        className="w-10 h-10 rounded-full object-cover ring-2 ring-white/50"
+                      />
+                      {activeConversation.user.isOrganizer && (
+                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#8A2BE2] rounded-full flex items-center justify-center ring-2 ring-white">
+                          <Star className="w-2 h-2 text-white fill-white" />
+                        </div>
                       )}
                     </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="text-white font-bold truncate">
+                          {activeConversation.user.name}
+                        </h3>
+                        {activeConversation.user.verified && (
+                          <div className="flex-shrink-0 w-4 h-4 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center">
+                            <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-white/80 text-xs">{activeConversation.user.username}</p>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setActiveConversation(null);
+                        setShowMessages(false);
+                      }}
+                      className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                    >
+                      <X className="w-5 h-5 text-white" />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => {
-                      setActiveConversation(null);
-                      setShowMessages(false);
-                    }}
-                    className="text-gray-400 hover:text-gray-600"
-                  >
-                    <X className="w-6 h-6" />
-                  </button>
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div className="flex-1 overflow-y-auto bg-gray-50 px-5 py-4">
                   {activeConversation.messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-center">
                       <MessageCircle className="w-12 h-12 text-gray-300 mb-3" />
                       <p className="text-gray-500 text-sm">Send a message to start the conversation</p>
                     </div>
                   ) : (
-                    activeConversation.messages.map((msg) => (
-                      <div
-                        key={msg.id}
-                        className={`flex ${msg.senderId === 0 ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div className={`max-w-[75%] ${msg.senderId === 0 ? 'order-2' : 'order-1'}`}>
-                          <div className={`px-4 py-2 rounded-2xl ${
-                            msg.senderId === 0 
-                              ? 'bg-[#8A2BE2] text-white' 
-                              : 'bg-gray-100 text-gray-900'
-                          }`}>
-                            <p className="text-sm">{msg.text}</p>
+                    <div className="space-y-4">
+                      {activeConversation.messages.map((msg) => {
+                        const isMe = msg.senderId === 0;
+                        return (
+                          <div
+                            key={msg.id}
+                            className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+                          >
+                            <div className={`max-w-[75%] ${isMe ? 'order-2' : 'order-1'}`}>
+                              <div
+                                className={`rounded-2xl px-4 py-2.5 ${
+                                  isMe
+                                    ? 'bg-[#8A2BE2] text-white'
+                                    : 'bg-white text-gray-900 shadow-sm'
+                                }`}
+                              >
+                                <p className="text-sm leading-relaxed">{msg.text}</p>
+                              </div>
+                              <span className={`text-xs text-gray-400 mt-1 block ${
+                                isMe ? 'text-right' : 'text-left'
+                              }`}>
+                                {msg.timestamp}
+                              </span>
+                            </div>
                           </div>
-                          <p className="text-xs text-gray-400 mt-1 px-2">{msg.timestamp}</p>
-                        </div>
-                      </div>
-                    ))
+                        );
+                      })}
+                    </div>
                   )}
                 </div>
 
                 {/* Message Input */}
-                <div className="p-4 border-t border-gray-200">
+                <div className="bg-white border-t border-gray-200 px-5 py-4">
                   <div className="flex items-center gap-2">
                     <input
                       type="text"

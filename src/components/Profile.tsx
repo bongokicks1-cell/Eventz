@@ -386,7 +386,13 @@ const photos: Photo[] = [
   },
 ];
 
-export function Profile() {
+interface ProfileProps {
+  conversations: any[];
+  onStartConversation: (user: any) => any;
+  onSendMessage: (conversationId: number, messageText: string) => void;
+}
+
+export function Profile({ conversations, onStartConversation, onSendMessage }: ProfileProps) {
   const [activeTab, setActiveTab] = useState<'tickets' | 'events' | 'photos' | 'videos' | 'saved'>('events');
   const [savedEvents, setSavedEvents] = useState<Event[]>([]);
   const [showSavedEventsModal, setShowSavedEventsModal] = useState(false);

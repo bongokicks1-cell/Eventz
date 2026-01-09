@@ -3,6 +3,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { Heart, MessageCircle, Share2, Bookmark, MoreVertical, Clock, MapPin, Ticket, Search, Bell, X, Send, Eye, ArrowLeft, Calendar, Sparkles, TrendingUp, Users as UsersIcon, Star, ArrowUpRight, LayoutGrid, UserPlus, ThumbsUp, Play, Video, Flame, Zap, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 import { UserProfileModal } from './UserProfileModal';
+import { Conversation, Message } from '../App';
 
 interface Comment {
   id: number;
@@ -68,119 +69,6 @@ interface Notification {
   image?: string;
   read: boolean;
 }
-
-interface Message {
-  id: number;
-  senderId: number;
-  text: string;
-  timestamp: string;
-  read: boolean;
-}
-
-interface Conversation {
-  id: number;
-  user: {
-    name: string;
-    username: string;
-    avatar: string;
-    verified: boolean;
-    isOrganizer?: boolean;
-  };
-  lastMessage: {
-    text: string;
-    timestamp: string;
-    isRead: boolean;
-  };
-  unreadCount: number;
-  messages: Message[];
-}
-
-const mockConversations: Conversation[] = [
-  {
-    id: 1,
-    user: {
-      name: 'Jazz Events TZ',
-      username: '@jazzeventstz',
-      avatar: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100&h=100&fit=crop',
-      verified: true,
-      isOrganizer: true,
-    },
-    lastMessage: {
-      text: 'Thank you for attending! Hope you enjoyed the show 🎷',
-      timestamp: '5m ago',
-      isRead: false,
-    },
-    unreadCount: 2,
-    messages: [
-      { id: 1, senderId: 1, text: 'Hey! Thanks for getting tickets to Jazz Night!', timestamp: '2:30 PM', read: true },
-      { id: 2, senderId: 0, text: 'Can\'t wait! What time does it start?', timestamp: '2:32 PM', read: true },
-      { id: 3, senderId: 1, text: 'Doors open at 7 PM, show starts at 8 PM sharp!', timestamp: '2:35 PM', read: true },
-      { id: 4, senderId: 1, text: 'Thank you for attending! Hope you enjoyed the show 🎷', timestamp: '10:45 PM', read: false },
-    ],
-  },
-  {
-    id: 2,
-    user: {
-      name: 'Sarah Mitchell',
-      username: '@sarahmitchell',
-      avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop',
-      verified: false,
-    },
-    lastMessage: {
-      text: 'Are you going to the Amapiano Festival this weekend?',
-      timestamp: '1h ago',
-      isRead: true,
-    },
-    unreadCount: 0,
-    messages: [
-      { id: 1, senderId: 2, text: 'Hey! Saw you at the concert last night!', timestamp: 'Yesterday', read: true },
-      { id: 2, senderId: 0, text: 'Yes! It was amazing! 🎶', timestamp: 'Yesterday', read: true },
-      { id: 3, senderId: 2, text: 'Are you going to the Amapiano Festival this weekend?', timestamp: '1h ago', read: true },
-    ],
-  },
-  {
-    id: 3,
-    user: {
-      name: 'Dar Live Events',
-      username: '@darliveevents',
-      avatar: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=100&h=100&fit=crop',
-      verified: true,
-      isOrganizer: true,
-    },
-    lastMessage: {
-      text: 'Your VIP tickets have been confirmed! 🎫',
-      timestamp: '3h ago',
-      isRead: true,
-    },
-    unreadCount: 0,
-    messages: [
-      { id: 1, senderId: 3, text: 'Hi! We noticed you\'re interested in VIP packages', timestamp: '5:20 PM', read: true },
-      { id: 2, senderId: 0, text: 'Yes! What\'s included in the VIP package?', timestamp: '5:25 PM', read: true },
-      { id: 3, senderId: 3, text: 'Front row seats, meet & greet, and exclusive merch!', timestamp: '5:27 PM', read: true },
-      { id: 4, senderId: 3, text: 'Your VIP tickets have been confirmed! 🎫', timestamp: '6:15 PM', read: true },
-    ],
-  },
-  {
-    id: 4,
-    user: {
-      name: 'Marcus Rodriguez',
-      username: '@marcusrodriguez',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop',
-      verified: false,
-    },
-    lastMessage: {
-      text: 'Let me know if you need a ride to the venue',
-      timestamp: '1d ago',
-      isRead: true,
-    },
-    unreadCount: 0,
-    messages: [
-      { id: 1, senderId: 4, text: 'Yo! Got my tickets for Friday!', timestamp: 'Mon', read: true },
-      { id: 2, senderId: 0, text: 'Nice! Me too! 🔥', timestamp: 'Mon', read: true },
-      { id: 3, senderId: 4, text: 'Let me know if you need a ride to the venue', timestamp: 'Tue', read: true },
-    ],
-  },
-];
 
 const mockNotifications: Notification[] = [
   {
@@ -540,7 +428,13 @@ const mockPosts: Post[] = [
 
 type FilterTab = 'all' | 'following' | 'organizers' | 'trending';
 
-export function Feed() {
+interface FeedProps {
+  conversations: Conversation[];
+  onStartConversation: (user: { name: string; username?: string; avatar: string; verified: boolean; isOrganizer?: boolean }) => Conversation;
+  onSendMessage: (conversationId: number, messageText: string) => void;
+}
+
+export function Feed({ conversations: globalConversations, onStartConversation, onSendMessage }: FeedProps) {
   const [posts, setPosts] = useState<Post[]>(mockPosts);
   const [activeFilter, setActiveFilter] = useState<FilterTab>('all');
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
@@ -548,7 +442,6 @@ export function Feed() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [showMessages, setShowMessages] = useState(false);
-  const [conversations, setConversations] = useState<Conversation[]>(mockConversations);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
   const [messageText, setMessageText] = useState('');
   const [selectedUserProfile, setSelectedUserProfile] = useState<{ name: string; username: string; avatar: string; verified: boolean; isOrganizer?: boolean } | null>(null);
@@ -569,7 +462,7 @@ export function Feed() {
   const [imageTouchStart, setImageTouchStart] = useState<{ x: number; y: number } | null>(null);
   
   const unreadCount = notifications.filter((n) => !n.read).length;
-  const unreadMessagesCount = conversations.reduce((acc, conv) => acc + conv.unreadCount, 0);
+  const unreadMessagesCount = globalConversations.reduce((acc, conv) => acc + conv.unreadCount, 0);
 
   const getIcon = (type: string) => {
     switch (type) {
@@ -733,32 +626,17 @@ export function Feed() {
   const handleSendMessage = () => {
     if (!messageText.trim() || !activeConversation) return;
 
+    // Create the new message object for optimistic update
     const newMessage: Message = {
       id: Date.now(),
-      senderId: 0, // Current user ID (0 represents current user)
+      senderId: 0,
       text: messageText.trim(),
       timestamp: new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }),
       read: true,
     };
 
-    // Update conversations with the new message
-    setConversations(conversations.map(conv => {
-      if (conv.id === activeConversation.id) {
-        return {
-          ...conv,
-          messages: [...conv.messages, newMessage],
-          lastMessage: {
-            text: newMessage.text,
-            timestamp: 'Just now',
-            isRead: true,
-          },
-        };
-      }
-      return conv;
-    }));
-
-    // Update active conversation
-    setActiveConversation({
+    // Optimistically update local active conversation
+    const updatedConversation = {
       ...activeConversation,
       messages: [...activeConversation.messages, newMessage],
       lastMessage: {
@@ -766,43 +644,28 @@ export function Feed() {
         timestamp: 'Just now',
         isRead: true,
       },
-    });
+    };
+    setActiveConversation(updatedConversation);
 
+    // Update the global state
+    onSendMessage(activeConversation.id, messageText);
+
+    // Clear the input field
     setMessageText('');
-    toast.success('Message sent! 💬');
   };
 
-  const handleStartConversation = (user: { name: string; username: string; avatar: string; verified: boolean; isOrganizer?: boolean }, e?: React.MouseEvent) => {
+  const handleStartConversationLocal = (user: { name: string; username: string; avatar: string; verified: boolean; isOrganizer?: boolean }, e?: React.MouseEvent) => {
     e?.stopPropagation();
     
     // Close post detail if open
     setSelectedPost(null);
     
-    // Check if conversation already exists
-    const existingConv = conversations.find(conv => conv.user.username === user.username);
+    // Use the global conversation handler
+    const conversation = onStartConversation(user);
     
-    if (existingConv) {
-      // Open existing conversation
-      setActiveConversation(existingConv);
-      setShowMessages(true);
-    } else {
-      // Create new conversation
-      const newConversation: Conversation = {
-        id: Date.now(),
-        user: user,
-        lastMessage: {
-          text: 'Start a conversation...',
-          timestamp: 'Now',
-          isRead: true,
-        },
-        unreadCount: 0,
-        messages: [],
-      };
-      
-      setConversations([newConversation, ...conversations]);
-      setActiveConversation(newConversation);
-      setShowMessages(true);
-    }
+    // Open the conversation
+    setActiveConversation(conversation);
+    setShowMessages(true);
   };
 
   const handleOpenUserProfile = (user: { name: string; username: string; avatar: string; verified: boolean; isOrganizer?: boolean }, e?: React.MouseEvent) => {
@@ -1214,7 +1077,7 @@ export function Feed() {
                   </button>
 
                   <button
-                    onClick={(e) => handleStartConversation(post.user, e)}
+                    onClick={(e) => handleStartConversationLocal(post.user, e)}
                     className="flex items-center gap-2 px-3 py-2 bg-white text-gray-700 hover:bg-purple-50 hover:text-[#8A2BE2] rounded-lg transition-all"
                     title="Message"
                   >
@@ -1629,7 +1492,7 @@ export function Feed() {
 
                 {/* Conversations List */}
                 <div className="flex-1 overflow-y-auto">
-                  {conversations
+                  {globalConversations
                     .filter(conv => 
                       messageSearch === '' || 
                       conv.user.name.toLowerCase().includes(messageSearch.toLowerCase()) ||
@@ -2290,7 +2153,7 @@ export function Feed() {
             toast.success(`Following ${selectedUserProfile.name}! 🎉`);
           }}
           onMessage={() => {
-            handleStartConversation(selectedUserProfile);
+            handleStartConversationLocal(selectedUserProfile);
             setSelectedUserProfile(null);
           }}
         />
