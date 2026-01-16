@@ -524,7 +524,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
           {/* Artist/Performer Sub-Type Selection */}
           {profileData.organizerType === 'Artist / Performer' && (
             <div className="mb-5">
-              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 rounded-2xl p-6 border-2 border-purple-200 shadow-lg">
+              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 rounded-2xl p-6 border-2 border-purple-200 shadow-lg">
                 <div className="mb-5">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-12 h-12 bg-[#8A2BE2] rounded-xl flex items-center justify-center shadow-md">
@@ -626,7 +626,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
           {/* Organization/Institution Sub-Type Selection */}
           {profileData.organizerType === 'Organization / Institution' && (
             <div className="mb-5">
-              <div className="bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-cyan-200 shadow-lg">
+              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 rounded-2xl p-6 border-2 border-purple-200 shadow-lg">
                 <div className="mb-5">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-12 h-12 bg-[#8A2BE2] rounded-xl flex items-center justify-center shadow-md">
@@ -653,23 +653,23 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         onClick={() => handleInputChange('venueSubType', subType.name)}
                         className={`group relative border-3 rounded-2xl p-5 text-center transition-all duration-300 ${
                           isSelected 
-                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-cyan-200/50' 
-                            : 'border-white bg-white/80 hover:border-cyan-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
+                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-purple-200/50' 
+                            : 'border-white bg-white/80 hover:border-purple-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
                         }`}
                       >
                         <div className={`relative w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 ${
                           isSelected 
-                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-cyan-300/60' 
-                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-cyan-100 group-hover:to-blue-100'
+                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-purple-300/60' 
+                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-purple-100 group-hover:to-pink-100'
                         }`}>
                           <Icon className={`w-10 h-10 transition-all duration-300 ${
-                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-cyan-600 group-hover:scale-110'
+                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-purple-600 group-hover:scale-110'
                           }`} />
                           
                           {!isSelected && (
                             <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="absolute inset-0 rounded-2xl border-2 border-cyan-400 animate-ping"></div>
-                              <div className="absolute inset-0 rounded-2xl border-2 border-blue-400"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-purple-400 animate-ping"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-pink-400"></div>
                             </div>
                           )}
 
@@ -682,7 +682,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         </div>
                         
                         <h4 className={`mb-1.5 transition-all duration-300 ${
-                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-cyan-600'
+                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-purple-600'
                         }`}>
                           {subType.name}
                         </h4>
@@ -691,14 +691,14 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         
                         {isSelected && (
                           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 animate-fadeIn">
-                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-cyan-400/60 ring-4 ring-white">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-purple-400/60 ring-4 ring-white">
                               <Check className="w-5 h-5 text-white" strokeWidth={3} />
                             </div>
                           </div>
                         )}
                         
                         {isSelected && (
-                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/20 via-blue-400/20 to-indigo-400/20 pointer-events-none"></div>
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-400/20 via-pink-400/20 to-indigo-400/20 pointer-events-none"></div>
                         )}
                       </button>
                     );
@@ -706,7 +706,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                 </div>
 
                 {profileData.venueSubType && profileData.organizerType === 'Organization / Institution' && (
-                  <div className="mt-4 p-4 bg-white border-2 border-cyan-300 rounded-xl shadow-md animate-fadeIn">
+                  <div className="mt-4 p-4 bg-white border-2 border-purple-300 rounded-xl shadow-md animate-fadeIn">
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-xl flex items-center justify-center shadow-lg">
                         <Check className="w-6 h-6 text-white" strokeWidth={3} />
@@ -728,7 +728,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
           {/* Business/Corporate Sub-Type Selection */}
           {profileData.organizerType === 'Business / Corporate' && (
             <div className="mb-5">
-              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-indigo-200 shadow-lg">
+              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 rounded-2xl p-6 border-2 border-purple-200 shadow-lg">
                 <div className="mb-5">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-12 h-12 bg-[#8A2BE2] rounded-xl flex items-center justify-center shadow-md">
@@ -755,23 +755,23 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         onClick={() => handleInputChange('venueSubType', subType.name)}
                         className={`group relative border-3 rounded-2xl p-5 text-center transition-all duration-300 ${
                           isSelected 
-                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-indigo-200/50' 
-                            : 'border-white bg-white/80 hover:border-indigo-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
+                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-purple-200/50' 
+                            : 'border-white bg-white/80 hover:border-purple-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
                         }`}
                       >
                         <div className={`relative w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 ${
                           isSelected 
-                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-indigo-300/60' 
-                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-indigo-100 group-hover:to-purple-100'
+                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-purple-300/60' 
+                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-purple-100 group-hover:to-pink-100'
                         }`}>
                           <Icon className={`w-10 h-10 transition-all duration-300 ${
-                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-indigo-600 group-hover:scale-110'
+                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-purple-600 group-hover:scale-110'
                           }`} />
                           
                           {!isSelected && (
                             <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="absolute inset-0 rounded-2xl border-2 border-indigo-400 animate-ping"></div>
-                              <div className="absolute inset-0 rounded-2xl border-2 border-purple-400"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-purple-400 animate-ping"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-pink-400"></div>
                             </div>
                           )}
 
@@ -784,7 +784,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         </div>
                         
                         <h4 className={`mb-1.5 transition-all duration-300 ${
-                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-indigo-600'
+                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-purple-600'
                         }`}>
                           {subType.name}
                         </h4>
@@ -793,14 +793,14 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         
                         {isSelected && (
                           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 animate-fadeIn">
-                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-indigo-400/60 ring-4 ring-white">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-purple-400/60 ring-4 ring-white">
                               <Check className="w-5 h-5 text-white" strokeWidth={3} />
                             </div>
                           </div>
                         )}
                         
                         {isSelected && (
-                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-400/20 via-purple-400/20 to-blue-400/20 pointer-events-none"></div>
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-400/20 via-pink-400/20 to-indigo-400/20 pointer-events-none"></div>
                         )}
                       </button>
                     );
@@ -808,7 +808,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                 </div>
 
                 {profileData.venueSubType && profileData.organizerType === 'Business / Corporate' && (
-                  <div className="mt-4 p-4 bg-white border-2 border-indigo-300 rounded-xl shadow-md animate-fadeIn">
+                  <div className="mt-4 p-4 bg-white border-2 border-purple-300 rounded-xl shadow-md animate-fadeIn">
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-xl flex items-center justify-center shadow-lg">
                         <Check className="w-6 h-6 text-white" strokeWidth={3} />
@@ -830,7 +830,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
           {/* Sports Club/Fitness Provider Sub-Type Selection */}
           {profileData.organizerType === 'Sports Club / Fitness Provider' && (
             <div className="mb-5">
-              <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-6 border-2 border-green-200 shadow-lg">
+              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 rounded-2xl p-6 border-2 border-purple-200 shadow-lg">
                 <div className="mb-5">
                   <div className="flex items-center gap-3 mb-2">
                     <div className="w-12 h-12 bg-[#8A2BE2] rounded-xl flex items-center justify-center shadow-md">
@@ -857,23 +857,23 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         onClick={() => handleInputChange('venueSubType', subType.name)}
                         className={`group relative border-3 rounded-2xl p-5 text-center transition-all duration-300 ${
                           isSelected 
-                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-green-200/50' 
-                            : 'border-white bg-white/80 hover:border-green-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
+                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-purple-200/50' 
+                            : 'border-white bg-white/80 hover:border-purple-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
                         }`}
                       >
                         <div className={`relative w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 ${
                           isSelected 
-                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-green-300/60' 
-                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-green-100 group-hover:to-emerald-100'
+                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-purple-300/60' 
+                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-purple-100 group-hover:to-pink-100'
                         }`}>
                           <Icon className={`w-10 h-10 transition-all duration-300 ${
-                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-green-600 group-hover:scale-110'
+                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-purple-600 group-hover:scale-110'
                           }`} />
                           
                           {!isSelected && (
                             <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                              <div className="absolute inset-0 rounded-2xl border-2 border-green-400 animate-ping"></div>
-                              <div className="absolute inset-0 rounded-2xl border-2 border-emerald-400"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-purple-400 animate-ping"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-pink-400"></div>
                             </div>
                           )}
 
@@ -886,7 +886,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         </div>
                         
                         <h4 className={`mb-1.5 transition-all duration-300 ${
-                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-green-600'
+                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-purple-600'
                         }`}>
                           {subType.name}
                         </h4>
@@ -895,14 +895,14 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         
                         {isSelected && (
                           <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 animate-fadeIn">
-                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-green-400/60 ring-4 ring-white">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-purple-400/60 ring-4 ring-white">
                               <Check className="w-5 h-5 text-white" strokeWidth={3} />
                             </div>
                           </div>
                         )}
                         
                         {isSelected && (
-                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-green-400/20 via-emerald-400/20 to-teal-400/20 pointer-events-none"></div>
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-400/20 via-pink-400/20 to-indigo-400/20 pointer-events-none"></div>
                         )}
                       </button>
                     );
@@ -910,7 +910,7 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                 </div>
 
                 {profileData.venueSubType && profileData.organizerType === 'Sports Club / Fitness Provider' && (
-                  <div className="mt-4 p-4 bg-white border-2 border-green-300 rounded-xl shadow-md animate-fadeIn">
+                  <div className="mt-4 p-4 bg-white border-2 border-purple-300 rounded-xl shadow-md animate-fadeIn">
                     <div className="flex items-center gap-3">
                       <div className="w-11 h-11 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-xl flex items-center justify-center shadow-lg">
                         <Check className="w-6 h-6 text-white" strokeWidth={3} />

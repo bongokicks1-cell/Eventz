@@ -351,7 +351,7 @@ export function OrganizerSettingsModal({ onClose }: OrganizerSettingsModalProps)
 
                     {/* Artist/Performer Sub-Type Selection */}
                     {profileData.organizerType === 'Artist/Performer' && (
-                      <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 rounded-xl p-5 border-2 border-purple-200">
+                      <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 rounded-xl p-5 border-2 border-purple-200">
                         <div className="mb-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Mic2 className="w-5 h-5 text-[#8A2BE2]" />
@@ -419,7 +419,7 @@ export function OrganizerSettingsModal({ onClose }: OrganizerSettingsModalProps)
 
                     {/* Organization/Institution Sub-Type Selection */}
                     {profileData.organizerType === 'Organization/Institution' && (
-                      <div className="bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-cyan-200">
+                      <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 rounded-xl p-5 border-2 border-purple-200">
                         <div className="mb-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Users className="w-5 h-5 text-[#8A2BE2]" />
@@ -448,7 +448,7 @@ export function OrganizerSettingsModal({ onClose }: OrganizerSettingsModalProps)
                                 className={`relative border-2 rounded-xl p-4 text-center transition-all min-h-[110px] flex flex-col items-center justify-center ${
                                   isSelected 
                                     ? 'border-[#8A2BE2] bg-white shadow-lg' 
-                                    : 'border-white bg-white/80 hover:border-cyan-300 hover:shadow-md'
+                                    : 'border-white bg-white/80 hover:border-purple-300 hover:shadow-md'
                                 }`}
                               >
                                 <div className="flex flex-col items-center justify-center w-full">
@@ -487,7 +487,7 @@ export function OrganizerSettingsModal({ onClose }: OrganizerSettingsModalProps)
 
                     {/* Business/Corporate Sub-Type Selection */}
                     {profileData.organizerType === 'Business/Corporate' && (
-                      <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 rounded-xl p-5 border-2 border-indigo-200">
+                      <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 rounded-xl p-5 border-2 border-purple-200">
                         <div className="mb-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Briefcase className="w-5 h-5 text-[#8A2BE2]" />
@@ -516,7 +516,7 @@ export function OrganizerSettingsModal({ onClose }: OrganizerSettingsModalProps)
                                 className={`relative border-2 rounded-xl p-4 text-center transition-all min-h-[110px] flex flex-col items-center justify-center ${
                                   isSelected 
                                     ? 'border-[#8A2BE2] bg-white shadow-lg' 
-                                    : 'border-white bg-white/80 hover:border-indigo-300 hover:shadow-md'
+                                    : 'border-white bg-white/80 hover:border-purple-300 hover:shadow-md'
                                 }`}
                               >
                                 <div className="flex flex-col items-center justify-center w-full">
@@ -555,7 +555,7 @@ export function OrganizerSettingsModal({ onClose }: OrganizerSettingsModalProps)
 
                     {/* Sports Club/Fitness Provider Sub-Type Selection */}
                     {profileData.organizerType === 'Sports Club/Fitness' && (
-                      <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl p-5 border-2 border-green-200">
+                      <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-purple-50 rounded-xl p-5 border-2 border-purple-200">
                         <div className="mb-4">
                           <div className="flex items-center gap-2 mb-2">
                             <Trophy className="w-5 h-5 text-[#8A2BE2]" />
@@ -584,7 +584,7 @@ export function OrganizerSettingsModal({ onClose }: OrganizerSettingsModalProps)
                                 className={`relative border-2 rounded-xl p-4 text-center transition-all min-h-[110px] flex flex-col items-center justify-center ${
                                   isSelected 
                                     ? 'border-[#8A2BE2] bg-white shadow-lg' 
-                                    : 'border-white bg-white/80 hover:border-green-300 hover:shadow-md'
+                                    : 'border-white bg-white/80 hover:border-purple-300 hover:shadow-md'
                                 }`}
                               >
                                 <div className="flex flex-col items-center justify-center w-full">
