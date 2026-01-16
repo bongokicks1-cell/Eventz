@@ -823,8 +823,8 @@
     z-index: 110;
   }
 
-  .z-\[9999\] {
-    z-index: 9999;
+  .z-\[99999\] {
+    z-index: 99999;
   }
 
   .order-1 {
@@ -1429,6 +1429,16 @@
 
   .-translate-x-1\/2 {
     --tw-translate-x: calc(calc(1 / 2 * 100%) * -1);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+
+  .translate-x-1 {
+    --tw-translate-x: calc(var(--spacing) * 1);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+
+  .translate-x-6 {
+    --tw-translate-x: calc(var(--spacing) * 6);
     translate: var(--tw-translate-x) var(--tw-translate-y);
   }
 
@@ -3844,6 +3854,18 @@
   }
 
   @media (hover: hover) {
+    .group-hover\:bg-cyan-200:is(:where(.group):hover *) {
+      background-color: var(--color-cyan-200);
+    }
+  }
+
+  @media (hover: hover) {
+    .group-hover\:bg-pink-200:is(:where(.group):hover *) {
+      background-color: var(--color-pink-200);
+    }
+  }
+
+  @media (hover: hover) {
     .group-hover\:bg-purple-50:is(:where(.group):hover *) {
       background-color: var(--color-purple-50);
     }
@@ -3852,6 +3874,12 @@
   @media (hover: hover) {
     .group-hover\:bg-purple-100:is(:where(.group):hover *) {
       background-color: var(--color-purple-100);
+    }
+  }
+
+  @media (hover: hover) {
+    .group-hover\:bg-purple-200:is(:where(.group):hover *) {
+      background-color: var(--color-purple-200);
     }
   }
 
@@ -4020,12 +4048,6 @@
   @media (hover: hover) {
     .hover\:border-cyan-400:hover {
       border-color: var(--color-cyan-400);
-    }
-  }
-
-  @media (hover: hover) {
-    .hover\:border-gray-200:hover {
-      border-color: var(--color-gray-200);
     }
   }
 
@@ -4471,6 +4493,18 @@
     .hover\:shadow-xl:hover {
       --tw-shadow: 0 20px 25px -5px var(--tw-shadow-color, #0000001a), 0 8px 10px -6px var(--tw-shadow-color, #0000001a);
       box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:shadow-purple-500\/30:hover {
+      --tw-shadow-color: color-mix(in srgb, oklch(.627 .265 303.9) 30%, transparent);
+    }
+
+    @supports (color: color-mix(in lab, red, red)) {
+      .hover\:shadow-purple-500\/30:hover {
+        --tw-shadow-color: color-mix(in oklab, color-mix(in oklab, var(--color-purple-500) 30%, transparent) var(--tw-shadow-alpha), transparent);
+      }
     }
   }
 

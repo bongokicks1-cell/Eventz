@@ -2,6 +2,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { toast } from 'sonner@2.0.3';
 import organizerProfileImg from 'figma:asset/f341912f973a7295b54e9b5936a0020cb0975622.png';
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { EventAnalyticsModal } from './EventAnalyticsModal';
 import { HighlightViewerModal } from './HighlightViewerModal';
 import { OrganizerSettingsModal } from './OrganizerSettingsModal';
@@ -171,16 +172,19 @@ export function OrganizerDashboard({ onCreateEvent, onEditEvent }: OrganizerDash
 
   return (
     <>
-      {/* Settings Button - FIXED at viewport level - Always visible */}
-      <div className="fixed top-4 right-4 z-[9999]">
-        <button 
-          onClick={() => setShowSettings(true)}
-          className="flex items-center gap-2 bg-white shadow-xl text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 hover:shadow-2xl transition-all border border-gray-200 flex-shrink-0 backdrop-blur-sm"
-        >
-          <Settings className="w-4 h-4 flex-shrink-0" />
-          <span className="text-sm font-medium whitespace-nowrap hidden xs:inline">Settings</span>
-        </button>
-      </div>
+      {/* Settings Button - Portal to document.body to TRULY ESCAPE all parent containers */}
+      {createPortal(
+        <div className="fixed top-4 right-4 z-[99999]" style={{ position: 'fixed' }}>
+          <button 
+            onClick={() => setShowSettings(true)}
+            className="flex items-center gap-2 bg-white shadow-xl text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-50 hover:shadow-2xl transition-all border border-gray-200 flex-shrink-0 backdrop-blur-sm"
+          >
+            <Settings className="w-4 h-4 flex-shrink-0" />
+            <span className="text-sm font-medium whitespace-nowrap hidden xs:inline">Settings</span>
+          </button>
+        </div>,
+        document.body
+      )}
 
       <div className="bg-gray-50 min-h-screen pb-24">
         {/* Professional Header - Solid Purple */}
