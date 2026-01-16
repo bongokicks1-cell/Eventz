@@ -1,4 +1,4 @@
-import { X, Heart, Share2, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize } from 'lucide-react';
+import { X, Heart, Share2, Volume2, VolumeX, RotateCcw, RotateCw, Play, Pause } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useState, useEffect, useRef } from 'react';
 import { ShareModal } from './ShareModal';
@@ -33,12 +33,15 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isLiked, setIsLiked] = useState(false);
   const [likes, setLikes] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(type === 'video');
-  const [isMuted, setIsMuted] = useState(false);
-  const [showControls, setShowControls] = useState(true);
-  const controlsTimeoutRef = useRef<NodeJS.Timeout>();
-  const [fullscreenAvailable, setFullscreenAvailable] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [showFeedback, setShowFeedback] = useState<'rewind' | 'forward' | 'play' | 'pause' | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
   const [showShareModal, setShowShareModal] = useState(false);
 
   const currentMedia = media[currentIndex];
@@ -52,13 +55,52 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
     setIsLiked(false);
   }, [currentIndex, currentMedia, type]);
 
+  // Update progress bar for videos
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const updateProgress = () => {
+      const percentage = (video.currentTime / video.duration) * 100;
+      setProgress(percentage);
+      setCurrentTime(video.currentTime);
+    };
+
+    const updateDuration = () => {
+      setDuration(video.duration);
+    };
+
+    video.addEventListener('timeupdate', updateProgress);
+    video.addEventListener('loadedmetadata', updateDuration);
+    return () => {
+      video.removeEventListener('timeupdate', updateProgress);
+      video.removeEventListener('loadedmetadata', updateDuration);
+    };
+  }, [currentIndex]);
+
+  // Auto-hide feedback
+  useEffect(() => {
+    if (showFeedback) {
+      const timer = setTimeout(() => setShowFeedback(null), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [showFeedback]);
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft' && currentIndex > 0) {
-        goToPrevious();
-      } else if (e.key === 'ArrowRight' && currentIndex < media.length - 1) {
-        goToNext();
+      if (e.key === 'ArrowLeft') {
+        if (type === 'video') {
+          rewind();
+        } else if (currentIndex > 0) {
+          setCurrentIndex(currentIndex - 1);
+        }
+      } else if (e.key === 'ArrowRight') {
+        if (type === 'video') {
+          forward();
+        } else if (currentIndex < media.length - 1) {
+          setCurrentIndex(currentIndex + 1);
+        }
       } else if (e.key === 'Escape') {
         onClose();
       } else if (e.key === ' ' && type === 'video') {
@@ -69,47 +111,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentIndex, media.length, onClose, type]);
-
-  // Auto-hide controls for video
-  useEffect(() => {
-    if (type === 'video' && isPlaying) {
-      controlsTimeoutRef.current = setTimeout(() => {
-        setShowControls(false);
-      }, 3000);
-    }
-
-    return () => {
-      if (controlsTimeoutRef.current) {
-        clearTimeout(controlsTimeoutRef.current);
-      }
-    };
-  }, [showControls, isPlaying, type]);
-
-  const handleMouseMove = () => {
-    setShowControls(true);
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-  };
-
-  const goToNext = () => {
-    if (currentIndex < media.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-      if (type === 'video') {
-        setIsPlaying(true);
-      }
-    }
-  };
-
-  const goToPrevious = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-      if (type === 'video') {
-        setIsPlaying(true);
-      }
-    }
-  };
+  }, [currentIndex, media.length, onClose, type, isPlaying]);
 
   const toggleLike = () => {
     if (!isLiked) {
@@ -133,7 +135,6 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
       url: window.location.href,
     });
     
-    // If native share not available, show custom modal
     if (!shared) {
       setShowShareModal(true);
     }
@@ -143,290 +144,265 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
+        setShowFeedback('pause');
       } else {
         videoRef.current.play();
+        setShowFeedback('play');
       }
+      setIsPlaying(!isPlaying);
     }
-    setIsPlaying(!isPlaying);
   };
 
   const toggleMute = () => {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
     }
-    setIsMuted(!isMuted);
   };
 
-  // Auto-play video when opened or index changes
-  useEffect(() => {
-    if (type === 'video' && videoRef.current) {
-      if (isPlaying) {
-        // Try to play unmuted first
-        videoRef.current.play().catch(() => {
-          // If blocked, try muted
-          if (videoRef.current) {
-            videoRef.current.muted = true;
-            setIsMuted(true);
-            videoRef.current.play().catch(() => {
-              // Still blocked, give up but don't crash
-              setIsPlaying(false);
-            });
-          }
-        });
-      }
+  const rewind = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.max(0, videoRef.current.currentTime - 10);
+      setShowFeedback('rewind');
     }
-  }, [currentIndex, type, isPlaying]);
+  };
 
-  const toggleFullscreen = async () => {
-    if (!fullscreenAvailable) return;
+  const forward = () => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = Math.min(videoRef.current.duration, videoRef.current.currentTime + 10);
+      setShowFeedback('forward');
+    }
+  };
+
+  // Handle tap zones for video
+  const handleVideoTap = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (type !== 'video') return;
     
-    try {
-      const container = document.documentElement;
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-      } else {
-        await container.requestFullscreen();
-      }
-    } catch (error) {
-      // Silently fail - fullscreen might be blocked by browser policy
-      console.log('Fullscreen not available');
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const width = rect.width;
+    
+    // Left third = rewind 10s
+    if (x < width / 3) {
+      rewind();
+    } 
+    // Right third = forward 10s
+    else if (x > (2 * width) / 3) {
+      forward();
+    } 
+    // Center = play/pause
+    else {
+      togglePlayPause();
     }
   };
 
-  // Check if fullscreen is available
+  // Handle progress bar scrubbing
+  const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!videoRef.current || type !== 'video') return;
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percentage = x / rect.width;
+    const newTime = percentage * videoRef.current.duration;
+    
+    videoRef.current.currentTime = newTime;
+  };
+
+  const handleProgressMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (type !== 'video') return;
+    setIsDragging(true);
+    handleProgressClick(e);
+  };
+
+  const handleProgressMouseMove = (e: MouseEvent) => {
+    if (!isDragging || !videoRef.current || type !== 'video' || !progressBarRef.current) return;
+    
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const percentage = x / rect.width;
+    const newTime = percentage * videoRef.current.duration;
+    
+    videoRef.current.currentTime = newTime;
+  };
+
+  const handleProgressMouseUp = () => {
+    setIsDragging(false);
+  };
+
   useEffect(() => {
-    setFullscreenAvailable(!!document.documentElement.requestFullscreen);
-  }, []);
+    if (isDragging) {
+      window.addEventListener('mousemove', handleProgressMouseMove);
+      window.addEventListener('mouseup', handleProgressMouseUp);
+      return () => {
+        window.removeEventListener('mousemove', handleProgressMouseMove);
+        window.removeEventListener('mouseup', handleProgressMouseUp);
+      };
+    }
+  }, [isDragging]);
+
+  // Format time (seconds to MM:SS)
+  const formatTime = (seconds: number) => {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   return (
-    <div 
-      className="fixed inset-0 z-[70] bg-black flex items-center justify-center"
-      onMouseMove={handleMouseMove}
-    >
-      {/* Top Bar */}
-      <div 
-        className={`absolute top-0 left-0 right-0 z-20 bg-gradient-to-b from-black/80 to-transparent p-6 transition-all duration-300 ${
-          showControls || type === 'photo' ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-4">
-            {/* Close Button */}
-            <button
-              onClick={onClose}
-              className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all flex items-center justify-center group"
-            >
-              <X className="w-6 h-6 text-white group-hover:rotate-90 transition-transform duration-300" />
-            </button>
-            
-            {/* Media Info */}
-            <div className="text-white">
-              <p className="font-medium">
-                {type === 'photo' 
-                  ? (currentMedia as Photo).eventName 
-                  : ((currentMedia as VideoClip).eventName || 'Highlight')}
-              </p>
-              <p className="text-white/70 text-sm">
-                {currentIndex + 1} / {media.length}
-              </p>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={toggleLike}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
-                isLiked
-                  ? 'bg-pink-500 text-white scale-110'
-                  : 'bg-white/10 backdrop-blur-md text-white hover:bg-white/20'
-              }`}
-            >
-              <Heart className={`w-5 h-5 ${isLiked ? 'fill-white' : ''}`} />
-              <span>{likes.toLocaleString()}</span>
-            </button>
-            
-            <button
-              onClick={handleShare}
-              className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all flex items-center justify-center"
-            >
-              <Share2 className="w-5 h-5 text-white" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Navigation Arrows */}
-      {currentIndex > 0 && (
-        <button
-          onClick={goToPrevious}
-          className={`absolute left-6 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all flex items-center justify-center group ${
-            showControls || type === 'photo' ? 'opacity-100' : 'opacity-0'
-          }`}
+    <div className="fixed inset-0 bg-black z-[100]">
+      {/* Main Content - Full Screen */}
+      <div className="relative h-full w-full flex items-center justify-center">
+        {/* Media Content - Tap zones for videos */}
+        <div 
+          className="w-full h-full relative"
+          onClick={handleVideoTap}
         >
-          <ChevronLeft className="w-7 h-7 text-white group-hover:-translate-x-1 transition-transform" />
-        </button>
-      )}
-
-      {currentIndex < media.length - 1 && (
-        <button
-          onClick={goToNext}
-          className={`absolute right-6 z-20 w-12 h-12 rounded-full bg-white/10 backdrop-blur-md hover:bg-white/20 transition-all flex items-center justify-center group ${
-            showControls || type === 'photo' ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <ChevronRight className="w-7 h-7 text-white group-hover:translate-x-1 transition-transform" />
-        </button>
-      )}
-
-      {/* Media Content */}
-      <div className="relative w-full h-full flex items-center justify-center p-20">
-        {type === 'photo' ? (
-          <div className="relative max-w-6xl max-h-full">
+          {type === 'photo' ? (
             <ImageWithFallback
               src={(currentMedia as Photo).url}
               alt="Full size"
-              className="max-w-full max-h-[80vh] object-contain rounded-2xl shadow-2xl"
-              style={{ animation: 'zoomIn 0.3s ease-out' }}
+              className="w-full h-full object-contain"
             />
-          </div>
-        ) : (
-          <div className="relative w-full max-w-6xl">
-            {/* Real HTML5 Video Player */}
-            <div className="relative w-full max-h-[80vh] rounded-2xl shadow-2xl overflow-hidden">
-              <video
-                ref={videoRef}
-                src={(currentMedia as VideoClip).videoUrl}
-                className="w-full h-full object-contain"
-                style={{ animation: 'zoomIn 0.3s ease-out' }}
-                loop
-                playsInline
-                autoPlay
-                onClick={togglePlayPause}
-              />
-            </div>
-            
-            {/* Video Controls Overlay */}
-            <div 
-              className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6 rounded-b-2xl transition-all duration-300 ${
-                showControls ? 'opacity-100' : 'opacity-0'
-              }`}
-            >
-              <div className="flex items-center gap-4">
-                {/* Play/Pause */}
-                <button
-                  onClick={togglePlayPause}
-                  className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 transition-all flex items-center justify-center"
-                >
-                  {isPlaying ? (
-                    <Pause className="w-5 h-5 text-white fill-white" />
-                  ) : (
-                    <Play className="w-5 h-5 text-white fill-white ml-0.5" />
-                  )}
-                </button>
+          ) : (
+            <video
+              ref={videoRef}
+              src={(currentMedia as VideoClip).videoUrl}
+              autoPlay
+              loop
+              muted={isMuted}
+              playsInline
+              className="w-full h-full object-contain"
+            />
+          )}
 
-                {/* Duration */}
-                <span className="text-white text-sm">
-                  {(currentMedia as VideoClip).duration}
-                </span>
-
-                {/* Spacer */}
-                <div className="flex-1" />
-
-                {/* Volume */}
-                <button
-                  onClick={toggleMute}
-                  className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 transition-all flex items-center justify-center"
-                >
-                  {isMuted ? (
-                    <VolumeX className="w-5 h-5 text-white" />
-                  ) : (
-                    <Volume2 className="w-5 h-5 text-white" />
-                  )}
-                </button>
-
-                {/* Fullscreen */}
-                {fullscreenAvailable && (
-                  <button
-                    onClick={toggleFullscreen}
-                    className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md hover:bg-white/30 transition-all flex items-center justify-center"
-                  >
-                    <Maximize className="w-5 h-5 text-white" />
-                  </button>
-                )}
+          {/* Visual Feedback - Instagram Style */}
+          {showFeedback && type === 'video' && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="bg-black/60 backdrop-blur-sm rounded-full p-6 animate-feedback">
+                {showFeedback === 'rewind' && <RotateCcw className="w-12 h-12 text-white" />}
+                {showFeedback === 'forward' && <RotateCw className="w-12 h-12 text-white" />}
+                {showFeedback === 'play' && <Play className="w-12 h-12 text-white fill-white" />}
+                {showFeedback === 'pause' && <Pause className="w-12 h-12 text-white fill-white" />}
               </div>
             </div>
+          )}
+        </div>
 
-            {/* Center Play Button (when paused) */}
-            {!isPlaying && (
-              <button
-                onClick={togglePlayPause}
-                className="absolute inset-0 flex items-center justify-center group"
-              >
-                <div className="w-20 h-20 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center group-hover:scale-110 transition-transform shadow-2xl">
-                  <Play className="w-10 h-10 text-purple-600 fill-purple-600 ml-1" />
-                </div>
-              </button>
+        {/* Close Button - Top Left ONLY */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 left-4 z-30 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors"
+        >
+          <X className="w-5 h-5 text-white" />
+        </button>
+
+        {/* Mute Button - Top Right (videos only) */}
+        {type === 'video' && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleMute();
+            }}
+            className="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors"
+          >
+            {isMuted ? (
+              <VolumeX className="w-5 h-5 text-white" />
+            ) : (
+              <Volume2 className="w-5 h-5 text-white" />
             )}
-          </div>
+          </button>
         )}
-      </div>
 
-      {/* Bottom Thumbnail Strip */}
-      <div 
-        className={`absolute bottom-6 left-0 right-0 z-20 transition-all duration-300 ${
-          showControls || type === 'photo' ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide py-2">
-            {media.map((item, index) => (
-              <button
-                key={item.id}
-                onClick={() => setCurrentIndex(index)}
-                className={`relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden transition-all ${
-                  index === currentIndex
-                    ? 'ring-4 ring-purple-500 scale-110'
-                    : 'ring-2 ring-white/20 hover:ring-white/40 opacity-60 hover:opacity-100'
-                }`}
-              >
-                <ImageWithFallback
-                  src={type === 'photo' ? (item as Photo).url : (item as VideoClip).thumbnail}
-                  alt={`Thumbnail ${index + 1}`}
-                  className="w-full h-full object-cover"
-                />
-                {type === 'video' && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Play className="w-5 h-5 text-white fill-white/80" />
-                  </div>
-                )}
-              </button>
-            ))}
+        {/* Right Side Actions - TikTok Style */}
+        <div className="absolute right-3 bottom-32 flex flex-col items-center gap-6 z-30">
+          {/* Like */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleLike();
+            }}
+            className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+          >
+            <Heart
+              className={`w-8 h-8 transition-all drop-shadow-lg ${
+                isLiked ? 'fill-[#FF3CAC] text-[#FF3CAC]' : 'text-white'
+              }`}
+            />
+            <span className="text-white text-xs font-bold drop-shadow-lg">{likes}</span>
+          </button>
+
+          {/* Share */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleShare();
+            }}
+            className="flex flex-col items-center gap-1 transition-transform active:scale-90"
+          >
+            <Share2 className="w-7 h-7 text-white drop-shadow-lg" />
+          </button>
+        </div>
+
+        {/* Bottom Info & Controls */}
+        <div className="absolute bottom-0 left-0 right-0 z-20 pb-6 pt-24 px-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+          {/* Event Name & Counter */}
+          <div className="mb-4">
+            <h3 className="text-white font-semibold mb-1 line-clamp-2 drop-shadow-lg">
+              {type === 'photo' 
+                ? (currentMedia as Photo).eventName 
+                : ((currentMedia as VideoClip).eventName || 'Highlight')}
+            </h3>
+            <p className="text-white/70 text-xs drop-shadow-lg">
+              {currentIndex + 1} / {media.length}
+            </p>
           </div>
+
+          {/* Video Controls - Bottom Progress Bar */}
+          {type === 'video' && (
+            <div className="space-y-2">
+              {/* Interactive Progress Bar */}
+              <div 
+                ref={progressBarRef}
+                className="relative h-1 bg-white/20 rounded-full cursor-pointer group"
+                onMouseDown={handleProgressMouseDown}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div 
+                  className="absolute inset-y-0 left-0 bg-[#8A2BE2] rounded-full transition-all"
+                  style={{ width: `${progress}%` }}
+                />
+                {/* Scrubber handle */}
+                <div 
+                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }}
+                />
+              </div>
+
+              {/* Time Display */}
+              <div className="flex items-center justify-between text-white/80 text-xs">
+                <span>{formatTime(currentTime)}</span>
+                <span>{formatTime(duration)}</span>
+              </div>
+
+              {/* Control Hints */}
+              <div className="flex items-center justify-center gap-6 text-white/50 text-xs mt-2">
+                <span className="flex items-center gap-1">
+                  <RotateCcw className="w-3 h-3" />
+                  Tap left -10s
+                </span>
+                <span className="flex items-center gap-1">
+                  {isPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                  Tap center
+                </span>
+                <span className="flex items-center gap-1">
+                  <RotateCw className="w-3 h-3" />
+                  Tap right +10s
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-
-      <style dangerouslySetInnerHTML={{__html: `
-        @keyframes zoomIn {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}} />
 
       {/* Share Modal */}
       <ShareModal
@@ -438,6 +414,27 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
         text="Check out this amazing moment on EVENTZ!"
         url={window.location.href}
       />
+
+      <style dangerouslySetInnerHTML={{__html: `
+        @keyframes feedback {
+          0% {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.1);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(1);
+          }
+        }
+        
+        .animate-feedback {
+          animation: feedback 0.5s ease-out;
+        }
+      `}} />
     </div>
   );
 }
