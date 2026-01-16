@@ -215,7 +215,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
     }
   };
 
-  // Handle progress bar scrubbing (MOUSE)
+  // Handle progress bar scrubbing
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!videoRef.current || type !== 'video') return;
     
@@ -249,7 +249,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
     setIsDragging(false);
   };
 
-  // Handle progress bar scrubbing (TOUCH - MOBILE)
+  // Touch handlers for mobile
   const handleProgressTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     if (type !== 'video' || !videoRef.current) return;
     e.stopPropagation();
@@ -442,23 +442,19 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
               {/* Interactive Progress Bar */}
               <div 
                 ref={progressBarRef}
-                className="relative h-4 bg-white/20 rounded-full cursor-pointer touch-none"
+                className="relative h-1 bg-white/20 rounded-full cursor-pointer group"
                 onMouseDown={handleProgressMouseDown}
                 onClick={(e) => e.stopPropagation()}
                 onTouchStart={handleProgressTouchStart}
               >
                 <div 
-                  className="absolute inset-y-0 left-0 bg-[#8A2BE2] rounded-full transition-all pointer-events-none"
+                  className="absolute inset-y-0 left-0 bg-[#8A2BE2] rounded-full transition-all"
                   style={{ width: `${progress}%` }}
                 />
-                {/* Scrubber handle - Larger for mobile */}
+                {/* Scrubber handle */}
                 <div 
-                  className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg transition-opacity pointer-events-none"
-                  style={{ 
-                    left: `${progress}%`, 
-                    transform: 'translate(-50%, -50%)',
-                    opacity: isDragging ? 1 : 0.8
-                  }}
+                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                  style={{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }}
                 />
               </div>
 
