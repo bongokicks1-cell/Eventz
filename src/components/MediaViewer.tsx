@@ -348,11 +348,11 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
           {/* Visual Feedback - Instagram Style */}
           {showFeedback && type === 'video' && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-black/60 backdrop-blur-sm rounded-full p-6 animate-feedback">
-                {showFeedback === 'rewind' && <RotateCcw className="w-12 h-12 text-white" />}
-                {showFeedback === 'forward' && <RotateCw className="w-12 h-12 text-white" />}
-                {showFeedback === 'play' && <Play className="w-12 h-12 text-white fill-white" />}
-                {showFeedback === 'pause' && <Pause className="w-12 h-12 text-white fill-white" />}
+              <div className="bg-black/50 backdrop-blur-sm rounded-full p-3 animate-feedback">
+                {showFeedback === 'rewind' && <RotateCcw className="w-6 h-6 text-white" />}
+                {showFeedback === 'forward' && <RotateCw className="w-6 h-6 text-white" />}
+                {showFeedback === 'play' && <Play className="w-6 h-6 text-white fill-white" />}
+                {showFeedback === 'pause' && <Pause className="w-6 h-6 text-white fill-white" />}
               </div>
             </div>
           )}
@@ -360,8 +360,8 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
           {/* Mobile Play Button (when autoplay blocked) */}
           {!isPlaying && type === 'video' && !isBuffering && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <div className="bg-white/90 backdrop-blur-sm rounded-full p-6 shadow-2xl">
-                <Play className="w-16 h-16 text-gray-900 fill-gray-900 ml-1" />
+              <div className="bg-white/90 backdrop-blur-sm rounded-full p-4 shadow-2xl">
+                <Play className="w-10 h-10 text-gray-900 fill-gray-900 ml-1" />
               </div>
             </div>
           )}
