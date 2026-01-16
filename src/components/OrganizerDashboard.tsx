@@ -7,6 +7,7 @@ import { HighlightViewerModal } from './HighlightViewerModal';
 import { OrganizerSettingsModal } from './OrganizerSettingsModal';
 import { ShareModal } from './ShareModal';
 import { handleShare as shareUtil } from '../utils/share';
+import { Settings, MapPin, Radio, BarChart3, Star, PlusCircle, Play, Share2, Heart, MessageCircle, DollarSign, Ticket, Eye, Users, Clock, Calendar, MoreVertical, Edit, TrendingUp } from 'lucide-react';
 
 interface OrganizerDashboardProps {
   onCreateEvent: () => void;

@@ -4,9 +4,10 @@ import { toast } from 'sonner@2.0.3';
 
 interface SetAlertModalProps {
   event: {
-    title: string;
+    title?: string;
+    name?: string;
     date: string;
-    time: string;
+    time?: string;
     location: string;
   };
   onClose: () => void;
@@ -33,7 +34,7 @@ export function SetAlertModal({ event, onClose }: SetAlertModalProps) {
 
     const message = selectedReminder === 'custom' 
       ? `Alert set for ${new Date(customDate).toLocaleDateString()} at ${customTime}`
-      : `You'll be reminded ${quickOptions.find(opt => opt.id === selectedReminder)?.time} before ${event.title}`;
+      : `You'll be reminded ${quickOptions.find(opt => opt.id === selectedReminder)?.time} before ${event.title || event.name}`;
     
     toast.success(message);
     onClose();
@@ -70,11 +71,11 @@ export function SetAlertModal({ event, onClose }: SetAlertModalProps) {
         {/* Event Info Card */}
         <div className="px-6 pt-6">
           <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-4 mb-6">
-            <h3 className="text-gray-900 mb-2 line-clamp-1">{event.title}</h3>
+            <h3 className="text-gray-900 mb-2 line-clamp-1">{event.title || event.name}</h3>
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Calendar className="w-4 h-4 text-purple-600" />
-                <span>{event.date} at {event.time}</span>
+                <span>{event.date}{event.time ? ` at ${event.time}` : ''}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <Clock className="w-4 h-4 text-purple-600" />

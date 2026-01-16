@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { User, Mail, Phone, MapPin, Globe, Instagram, Facebook, Twitter, ArrowRight, Building2, Mic2, Store, Users, Briefcase, Trophy, Check, Music, Wine, Coffee, UtensilsCrossed } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Globe, Instagram, Facebook, Twitter, ArrowRight, Building2, Mic2, Store, Users, Briefcase, Trophy, Check, Music, Wine, Coffee, UtensilsCrossed, Headphones, Radio, Mic, Heart, GraduationCap, School, Building, Church, Laptop, ShoppingBag, Plane, Film, Dumbbell, Activity, Flame, Target } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 
 interface OrganizerProfileSetupProps {
@@ -117,6 +117,130 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
     },
   ];
 
+  const artistSubTypes = [
+    {
+      id: 'dj',
+      name: 'DJ',
+      icon: Headphones,
+      description: 'DJ, electronic music',
+      emoji: '🎧',
+    },
+    {
+      id: 'band',
+      name: 'Live Band',
+      icon: Music,
+      description: 'Band, musicians',
+      emoji: '🎸',
+    },
+    {
+      id: 'solo',
+      name: 'Solo Artist',
+      icon: Mic,
+      description: 'Singer, solo performer',
+      emoji: '🎤',
+    },
+    {
+      id: 'entertainer',
+      name: 'Entertainer',
+      icon: Radio,
+      description: 'Comedian, MC, host',
+      emoji: '🎭',
+    },
+  ];
+
+  const organizationSubTypes = [
+    {
+      id: 'nonprofit',
+      name: 'Non-Profit',
+      icon: Heart,
+      description: 'NGO, charity, foundation',
+      emoji: '❤️',
+    },
+    {
+      id: 'education',
+      name: 'Educational',
+      icon: GraduationCap,
+      description: 'University, school',
+      emoji: '🎓',
+    },
+    {
+      id: 'community',
+      name: 'Community',
+      icon: Users,
+      description: 'Community group, club',
+      emoji: '👥',
+    },
+    {
+      id: 'religious',
+      name: 'Religious',
+      icon: Church,
+      description: 'Church, religious org',
+      emoji: '⛪',
+    },
+  ];
+
+  const businessSubTypes = [
+    {
+      id: 'tech',
+      name: 'Tech Company',
+      icon: Laptop,
+      description: 'Software, tech startup',
+      emoji: '💻',
+    },
+    {
+      id: 'retail',
+      name: 'Retail Brand',
+      icon: ShoppingBag,
+      description: 'Store, retail business',
+      emoji: '🛍️',
+    },
+    {
+      id: 'hospitality',
+      name: 'Hospitality',
+      icon: Plane,
+      description: 'Hotel, travel, tourism',
+      emoji: '✈️',
+    },
+    {
+      id: 'entertainment',
+      name: 'Entertainment',
+      icon: Film,
+      description: 'Media, production co.',
+      emoji: '🎬',
+    },
+  ];
+
+  const sportsSubTypes = [
+    {
+      id: 'gym',
+      name: 'Gym/Fitness',
+      icon: Dumbbell,
+      description: 'Gym, fitness center',
+      emoji: '💪',
+    },
+    {
+      id: 'sports',
+      name: 'Sports Club',
+      icon: Trophy,
+      description: 'Sports team, club',
+      emoji: '🏆',
+    },
+    {
+      id: 'yoga',
+      name: 'Yoga/Wellness',
+      icon: Activity,
+      description: 'Yoga, wellness studio',
+      emoji: '🧘',
+    },
+    {
+      id: 'martial',
+      name: 'Martial Arts',
+      icon: Target,
+      description: 'Fighting, martial arts',
+      emoji: '🥋',
+    },
+  ];
+
   const handleInputChange = (field: keyof OrganizerProfile, value: string) => {
     setProfileData((prev) => ({ ...prev, [field]: value }));
   };
@@ -129,17 +253,24 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
       return;
     }
 
-    // Validate venue subtype if Venue is selected
-    if (profileData.organizerType === 'Venue' && !profileData.venueSubType) {
-      toast.error('Please select a venue type', {
-        description: 'Choose the specific type of venue you operate',
+    // Validate sub-type for organizer types that require it (all except Individual Organizer)
+    const requiresSubType = profileData.organizerType !== 'Individual Organizer';
+    if (requiresSubType && !profileData.venueSubType) {
+      const typeLabel = profileData.organizerType === 'Venue' ? 'venue type' :
+                        profileData.organizerType === 'Artist / Performer' ? 'artist type' :
+                        profileData.organizerType === 'Organization / Institution' ? 'organization type' :
+                        profileData.organizerType === 'Business / Corporate' ? 'business type' :
+                        profileData.organizerType === 'Sports Club / Fitness Provider' ? 'sports/fitness type' : 'type';
+      
+      toast.error(`Please select a ${typeLabel}`, {
+        description: `Choose the specific ${typeLabel} that best describes you`,
       });
       return;
     }
 
     // Combine organizerType with venueSubType if applicable
-    const finalOrganizerType = profileData.organizerType === 'Venue' && profileData.venueSubType
-      ? `Venue - ${profileData.venueSubType}`
+    const finalOrganizerType = requiresSubType && profileData.venueSubType
+      ? `${profileData.organizerType} - ${profileData.venueSubType}`
       : profileData.organizerType;
 
     // Save organizer profile to localStorage with final combined type
@@ -381,6 +512,414 @@ export function OrganizerProfileSetup({ onComplete }: OrganizerProfileSetupProps
                         <p className="text-[#8A2BE2] flex items-center gap-2">
                           <Store className="w-4 h-4" />
                           <span>Venue - {profileData.venueSubType}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Artist/Performer Sub-Type Selection */}
+          {profileData.organizerType === 'Artist / Performer' && (
+            <div className="mb-5">
+              <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 rounded-2xl p-6 border-2 border-purple-200 shadow-lg">
+                <div className="mb-5">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-12 h-12 bg-[#8A2BE2] rounded-xl flex items-center justify-center shadow-md">
+                      <Mic2 className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-gray-900">
+                        Artist Type <span className="text-red-500">*</span>
+                      </label>
+                      <p className="text-gray-600 text-sm">What type of performer are you?</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  {artistSubTypes.map((subType) => {
+                    const Icon = subType.icon;
+                    const isSelected = profileData.venueSubType === subType.name;
+                    
+                    return (
+                      <button
+                        key={subType.id}
+                        type="button"
+                        onClick={() => handleInputChange('venueSubType', subType.name)}
+                        className={`group relative border-3 rounded-2xl p-5 text-center transition-all duration-300 ${
+                          isSelected 
+                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-purple-200/50' 
+                            : 'border-white bg-white/80 hover:border-purple-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
+                        }`}
+                      >
+                        <div className={`relative w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 ${
+                          isSelected 
+                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-purple-300/60' 
+                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-purple-100 group-hover:to-pink-100'
+                        }`}>
+                          <Icon className={`w-10 h-10 transition-all duration-300 ${
+                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-purple-600 group-hover:scale-110'
+                          }`} />
+                          
+                          {!isSelected && (
+                            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <div className="absolute inset-0 rounded-2xl border-2 border-purple-400 animate-ping"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-pink-400"></div>
+                            </div>
+                          )}
+
+                          {isSelected && (
+                            <>
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-300 rounded-full animate-pulse"></div>
+                              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-cyan-300 rounded-full animate-pulse delay-75"></div>
+                            </>
+                          )}
+                        </div>
+                        
+                        <h4 className={`mb-1.5 transition-all duration-300 ${
+                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-purple-600'
+                        }`}>
+                          {subType.name}
+                        </h4>
+                        
+                        <p className="text-gray-500 text-xs leading-relaxed">{subType.description}</p>
+                        
+                        {isSelected && (
+                          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 animate-fadeIn">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-purple-400/60 ring-4 ring-white">
+                              <Check className="w-5 h-5 text-white" strokeWidth={3} />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {isSelected && (
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-400/20 via-pink-400/20 to-indigo-400/20 pointer-events-none"></div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {profileData.venueSubType && profileData.organizerType === 'Artist / Performer' && (
+                  <div className="mt-4 p-4 bg-white border-2 border-purple-300 rounded-xl shadow-md animate-fadeIn">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-xl flex items-center justify-center shadow-lg">
+                        <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500 mb-0.5">Your organizer type will be saved as:</p>
+                        <p className="text-[#8A2BE2] flex items-center gap-2">
+                          <Mic2 className="w-4 h-4" />
+                          <span>Artist / Performer - {profileData.venueSubType}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Organization/Institution Sub-Type Selection */}
+          {profileData.organizerType === 'Organization / Institution' && (
+            <div className="mb-5">
+              <div className="bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-cyan-200 shadow-lg">
+                <div className="mb-5">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-12 h-12 bg-[#8A2BE2] rounded-xl flex items-center justify-center shadow-md">
+                      <Users className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-gray-900">
+                        Organization Type <span className="text-red-500">*</span>
+                      </label>
+                      <p className="text-gray-600 text-sm">What type of organization are you?</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  {organizationSubTypes.map((subType) => {
+                    const Icon = subType.icon;
+                    const isSelected = profileData.venueSubType === subType.name;
+                    
+                    return (
+                      <button
+                        key={subType.id}
+                        type="button"
+                        onClick={() => handleInputChange('venueSubType', subType.name)}
+                        className={`group relative border-3 rounded-2xl p-5 text-center transition-all duration-300 ${
+                          isSelected 
+                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-cyan-200/50' 
+                            : 'border-white bg-white/80 hover:border-cyan-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
+                        }`}
+                      >
+                        <div className={`relative w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 ${
+                          isSelected 
+                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-cyan-300/60' 
+                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-cyan-100 group-hover:to-blue-100'
+                        }`}>
+                          <Icon className={`w-10 h-10 transition-all duration-300 ${
+                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-cyan-600 group-hover:scale-110'
+                          }`} />
+                          
+                          {!isSelected && (
+                            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <div className="absolute inset-0 rounded-2xl border-2 border-cyan-400 animate-ping"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-blue-400"></div>
+                            </div>
+                          )}
+
+                          {isSelected && (
+                            <>
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-300 rounded-full animate-pulse"></div>
+                              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-cyan-300 rounded-full animate-pulse delay-75"></div>
+                            </>
+                          )}
+                        </div>
+                        
+                        <h4 className={`mb-1.5 transition-all duration-300 ${
+                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-cyan-600'
+                        }`}>
+                          {subType.name}
+                        </h4>
+                        
+                        <p className="text-gray-500 text-xs leading-relaxed">{subType.description}</p>
+                        
+                        {isSelected && (
+                          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 animate-fadeIn">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-cyan-400/60 ring-4 ring-white">
+                              <Check className="w-5 h-5 text-white" strokeWidth={3} />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {isSelected && (
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-cyan-400/20 via-blue-400/20 to-indigo-400/20 pointer-events-none"></div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {profileData.venueSubType && profileData.organizerType === 'Organization / Institution' && (
+                  <div className="mt-4 p-4 bg-white border-2 border-cyan-300 rounded-xl shadow-md animate-fadeIn">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-xl flex items-center justify-center shadow-lg">
+                        <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500 mb-0.5">Your organizer type will be saved as:</p>
+                        <p className="text-[#8A2BE2] flex items-center gap-2">
+                          <Users className="w-4 h-4" />
+                          <span>Organization / Institution - {profileData.venueSubType}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Business/Corporate Sub-Type Selection */}
+          {profileData.organizerType === 'Business / Corporate' && (
+            <div className="mb-5">
+              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 rounded-2xl p-6 border-2 border-indigo-200 shadow-lg">
+                <div className="mb-5">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-12 h-12 bg-[#8A2BE2] rounded-xl flex items-center justify-center shadow-md">
+                      <Briefcase className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-gray-900">
+                        Business Type <span className="text-red-500">*</span>
+                      </label>
+                      <p className="text-gray-600 text-sm">What type of business are you?</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  {businessSubTypes.map((subType) => {
+                    const Icon = subType.icon;
+                    const isSelected = profileData.venueSubType === subType.name;
+                    
+                    return (
+                      <button
+                        key={subType.id}
+                        type="button"
+                        onClick={() => handleInputChange('venueSubType', subType.name)}
+                        className={`group relative border-3 rounded-2xl p-5 text-center transition-all duration-300 ${
+                          isSelected 
+                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-indigo-200/50' 
+                            : 'border-white bg-white/80 hover:border-indigo-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
+                        }`}
+                      >
+                        <div className={`relative w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 ${
+                          isSelected 
+                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-indigo-300/60' 
+                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-indigo-100 group-hover:to-purple-100'
+                        }`}>
+                          <Icon className={`w-10 h-10 transition-all duration-300 ${
+                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-indigo-600 group-hover:scale-110'
+                          }`} />
+                          
+                          {!isSelected && (
+                            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <div className="absolute inset-0 rounded-2xl border-2 border-indigo-400 animate-ping"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-purple-400"></div>
+                            </div>
+                          )}
+
+                          {isSelected && (
+                            <>
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-300 rounded-full animate-pulse"></div>
+                              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-cyan-300 rounded-full animate-pulse delay-75"></div>
+                            </>
+                          )}
+                        </div>
+                        
+                        <h4 className={`mb-1.5 transition-all duration-300 ${
+                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-indigo-600'
+                        }`}>
+                          {subType.name}
+                        </h4>
+                        
+                        <p className="text-gray-500 text-xs leading-relaxed">{subType.description}</p>
+                        
+                        {isSelected && (
+                          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 animate-fadeIn">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-indigo-400/60 ring-4 ring-white">
+                              <Check className="w-5 h-5 text-white" strokeWidth={3} />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {isSelected && (
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-indigo-400/20 via-purple-400/20 to-blue-400/20 pointer-events-none"></div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {profileData.venueSubType && profileData.organizerType === 'Business / Corporate' && (
+                  <div className="mt-4 p-4 bg-white border-2 border-indigo-300 rounded-xl shadow-md animate-fadeIn">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-xl flex items-center justify-center shadow-lg">
+                        <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500 mb-0.5">Your organizer type will be saved as:</p>
+                        <p className="text-[#8A2BE2] flex items-center gap-2">
+                          <Briefcase className="w-4 h-4" />
+                          <span>Business / Corporate - {profileData.venueSubType}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Sports Club/Fitness Provider Sub-Type Selection */}
+          {profileData.organizerType === 'Sports Club / Fitness Provider' && (
+            <div className="mb-5">
+              <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-2xl p-6 border-2 border-green-200 shadow-lg">
+                <div className="mb-5">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-12 h-12 bg-[#8A2BE2] rounded-xl flex items-center justify-center shadow-md">
+                      <Trophy className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <label className="block text-gray-900">
+                        Sports/Fitness Type <span className="text-red-500">*</span>
+                      </label>
+                      <p className="text-gray-600 text-sm">What type of sports/fitness provider are you?</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  {sportsSubTypes.map((subType) => {
+                    const Icon = subType.icon;
+                    const isSelected = profileData.venueSubType === subType.name;
+                    
+                    return (
+                      <button
+                        key={subType.id}
+                        type="button"
+                        onClick={() => handleInputChange('venueSubType', subType.name)}
+                        className={`group relative border-3 rounded-2xl p-5 text-center transition-all duration-300 ${
+                          isSelected 
+                            ? 'border-[#8A2BE2] bg-white shadow-2xl scale-105 ring-4 ring-green-200/50' 
+                            : 'border-white bg-white/80 hover:border-green-300 hover:bg-white hover:shadow-xl hover:scale-[1.02]'
+                        }`}
+                      >
+                        <div className={`relative w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-3 transition-all duration-300 ${
+                          isSelected 
+                            ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-lg shadow-green-300/60' 
+                            : 'bg-gradient-to-br from-gray-100 to-gray-200 group-hover:from-green-100 group-hover:to-emerald-100'
+                        }`}>
+                          <Icon className={`w-10 h-10 transition-all duration-300 ${
+                            isSelected ? 'text-white scale-110' : 'text-gray-600 group-hover:text-green-600 group-hover:scale-110'
+                          }`} />
+                          
+                          {!isSelected && (
+                            <div className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                              <div className="absolute inset-0 rounded-2xl border-2 border-green-400 animate-ping"></div>
+                              <div className="absolute inset-0 rounded-2xl border-2 border-emerald-400"></div>
+                            </div>
+                          )}
+
+                          {isSelected && (
+                            <>
+                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-300 rounded-full animate-pulse"></div>
+                              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-cyan-300 rounded-full animate-pulse delay-75"></div>
+                            </>
+                          )}
+                        </div>
+                        
+                        <h4 className={`mb-1.5 transition-all duration-300 ${
+                          isSelected ? 'text-[#8A2BE2] scale-105' : 'text-gray-900 group-hover:text-green-600'
+                        }`}>
+                          {subType.name}
+                        </h4>
+                        
+                        <p className="text-gray-500 text-xs leading-relaxed">{subType.description}</p>
+                        
+                        {isSelected && (
+                          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 animate-fadeIn">
+                            <div className="w-8 h-8 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-lg shadow-green-400/60 ring-4 ring-white">
+                              <Check className="w-5 h-5 text-white" strokeWidth={3} />
+                            </div>
+                          </div>
+                        )}
+                        
+                        {isSelected && (
+                          <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-green-400/20 via-emerald-400/20 to-teal-400/20 pointer-events-none"></div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {profileData.venueSubType && profileData.organizerType === 'Sports Club / Fitness Provider' && (
+                  <div className="mt-4 p-4 bg-white border-2 border-green-300 rounded-xl shadow-md animate-fadeIn">
+                    <div className="flex items-center gap-3">
+                      <div className="w-11 h-11 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-xl flex items-center justify-center shadow-lg">
+                        <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-500 mb-0.5">Your organizer type will be saved as:</p>
+                        <p className="text-[#8A2BE2] flex items-center gap-2">
+                          <Trophy className="w-4 h-4" />
+                          <span>Sports Club / Fitness Provider - {profileData.venueSubType}</span>
                         </p>
                       </div>
                     </div>

@@ -5,6 +5,7 @@ import { toast } from 'sonner@2.0.3';
 import { SettingsModal } from './SettingsModal';
 import { MediaViewer } from './MediaViewer';
 import { TicketViewer } from './TicketViewer';
+import { SetAlertModal } from './SetAlertModal';
 
 interface Event {
   id: number;
@@ -412,6 +413,8 @@ export function Profile({ conversations, onStartConversation, onSendMessage }: P
   const [showTicketViewer, setShowTicketViewer] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<TicketEvent | null>(null);
   const [showAllEvents, setShowAllEvents] = useState(false);
+  const [showSetAlertModal, setShowSetAlertModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
 
   // Load saved events from localStorage
   useEffect(() => {
@@ -791,14 +794,22 @@ export function Profile({ conversations, onStartConversation, onSendMessage }: P
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleReminder(event.id, event.name);
+                        setSelectedEvent({
+                          id: event.id,
+                          name: event.name,
+                          date: event.date,
+                          image: event.image,
+                          location: event.location || 'Location TBA',
+                          category: event.category || 'Event',
+                        });
+                        setShowSetAlertModal(true);
                       }}
                       className={`flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center transition-all ${
                         eventReminders.has(event.id)
                           ? 'bg-purple-600 text-white shadow-md'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                       }`}
-                      title={eventReminders.has(event.id) ? 'Reminder set' : 'Set reminder'}
+                      title={eventReminders.has(event.id) ? 'Manage reminder' : 'Set reminder'}
                     >
                       <Bell className={`w-4 h-4 ${eventReminders.has(event.id) ? 'fill-white' : ''}`} />
                     </button>
@@ -1199,6 +1210,17 @@ export function Profile({ conversations, onStartConversation, onSendMessage }: P
           onClose={() => {
             setShowTicketViewer(false);
             setSelectedTicket(null);
+          }}
+        />
+      )}
+
+      {/* Set Alert Modal */}
+      {showSetAlertModal && selectedEvent && (
+        <SetAlertModal
+          event={selectedEvent}
+          onClose={() => {
+            setShowSetAlertModal(false);
+            setSelectedEvent(null);
           }}
         />
       )}

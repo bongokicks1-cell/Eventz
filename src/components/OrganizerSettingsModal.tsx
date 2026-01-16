@@ -24,7 +24,23 @@ import {
   Music,
   Wine,
   Coffee,
-  UtensilsCrossed
+  UtensilsCrossed,
+  Headphones,
+  Radio,
+  Mic,
+  Heart,
+  GraduationCap,
+  School,
+  Building,
+  Church,
+  Laptop,
+  ShoppingBag,
+  Plane,
+  Film,
+  Dumbbell,
+  Activity,
+  Flame,
+  Target
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner@2.0.3';
@@ -224,7 +240,7 @@ export function OrganizerSettingsModal({ onClose }: OrganizerSettingsModalProps)
                             <button
                               key={type.name}
                               type="button"
-                              onClick={() => setProfileData({ ...profileData, organizerType: type.name, venueSubType: type.name !== 'Venue' ? '' : profileData.venueSubType })}
+                              onClick={() => setProfileData({ ...profileData, organizerType: type.name, venueSubType: '' })}
                               className={`relative border-2 rounded-xl p-4 text-left transition-all hover:shadow-lg min-h-[92px] ${
                                 isSelected 
                                   ? 'border-[#8A2BE2] bg-purple-50 shadow-md' 
@@ -297,6 +313,278 @@ export function OrganizerSettingsModal({ onClose }: OrganizerSettingsModalProps)
                                   isSelected 
                                     ? 'border-[#8A2BE2] bg-white shadow-lg' 
                                     : 'border-white bg-white/80 hover:border-purple-300 hover:shadow-md'
+                                }`}
+                              >
+                                <div className="flex flex-col items-center justify-center w-full">
+                                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-2.5 transition-all ${
+                                    isSelected 
+                                      ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-md' 
+                                      : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                                  }`}>
+                                    <Icon className={`w-7 h-7 transition-colors ${
+                                      isSelected ? 'text-white' : 'text-gray-600'
+                                    }`} />
+                                  </div>
+                                  
+                                  <h4 className={`text-sm font-semibold mb-1 ${
+                                    isSelected ? 'text-[#8A2BE2]' : 'text-gray-900'
+                                  }`}>
+                                    {subType.name}
+                                  </h4>
+                                  
+                                  <p className="text-gray-500 text-xs">{subType.description}</p>
+                                </div>
+                                
+                                {isSelected && (
+                                  <div className="absolute top-2 right-2">
+                                    <div className="w-6 h-6 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-md">
+                                      <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                                    </div>
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Artist/Performer Sub-Type Selection */}
+                    {profileData.organizerType === 'Artist/Performer' && (
+                      <div className="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 rounded-xl p-5 border-2 border-purple-200">
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Mic2 className="w-5 h-5 text-[#8A2BE2]" />
+                            <label className="block text-gray-900 text-sm font-medium">
+                              Artist Type <span className="text-red-500">*</span>
+                            </label>
+                          </div>
+                          <p className="text-gray-600 text-xs">What type of performer are you?</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            { id: 'dj', name: 'DJ', icon: Headphones, description: 'DJ & electronic' },
+                            { id: 'band', name: 'Live Band', icon: Music, description: 'Band & musicians' },
+                            { id: 'solo', name: 'Solo Artist', icon: Mic, description: 'Solo performer' },
+                            { id: 'entertainer', name: 'Entertainer', icon: Radio, description: 'Comedian & MC' },
+                          ].map((subType) => {
+                            const Icon = subType.icon;
+                            const isSelected = profileData.venueSubType === subType.name;
+                            
+                            return (
+                              <button
+                                key={subType.id}
+                                type="button"
+                                onClick={() => setProfileData({ ...profileData, venueSubType: subType.name })}
+                                className={`relative border-2 rounded-xl p-4 text-center transition-all min-h-[110px] flex flex-col items-center justify-center ${
+                                  isSelected 
+                                    ? 'border-[#8A2BE2] bg-white shadow-lg' 
+                                    : 'border-white bg-white/80 hover:border-purple-300 hover:shadow-md'
+                                }`}
+                              >
+                                <div className="flex flex-col items-center justify-center w-full">
+                                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-2.5 transition-all ${
+                                    isSelected 
+                                      ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-md' 
+                                      : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                                  }`}>
+                                    <Icon className={`w-7 h-7 transition-colors ${
+                                      isSelected ? 'text-white' : 'text-gray-600'
+                                    }`} />
+                                  </div>
+                                  
+                                  <h4 className={`text-sm font-semibold mb-1 ${
+                                    isSelected ? 'text-[#8A2BE2]' : 'text-gray-900'
+                                  }`}>
+                                    {subType.name}
+                                  </h4>
+                                  
+                                  <p className="text-gray-500 text-xs">{subType.description}</p>
+                                </div>
+                                
+                                {isSelected && (
+                                  <div className="absolute top-2 right-2">
+                                    <div className="w-6 h-6 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-md">
+                                      <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                                    </div>
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Organization/Institution Sub-Type Selection */}
+                    {profileData.organizerType === 'Organization/Institution' && (
+                      <div className="bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 rounded-xl p-5 border-2 border-cyan-200">
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Users className="w-5 h-5 text-[#8A2BE2]" />
+                            <label className="block text-gray-900 text-sm font-medium">
+                              Organization Type <span className="text-red-500">*</span>
+                            </label>
+                          </div>
+                          <p className="text-gray-600 text-xs">What type of organization are you?</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            { id: 'nonprofit', name: 'Non-Profit', icon: Heart, description: 'NGO & charity' },
+                            { id: 'education', name: 'Educational', icon: GraduationCap, description: 'University & school' },
+                            { id: 'community', name: 'Community', icon: Users, description: 'Community group' },
+                            { id: 'religious', name: 'Religious', icon: Church, description: 'Religious org' },
+                          ].map((subType) => {
+                            const Icon = subType.icon;
+                            const isSelected = profileData.venueSubType === subType.name;
+                            
+                            return (
+                              <button
+                                key={subType.id}
+                                type="button"
+                                onClick={() => setProfileData({ ...profileData, venueSubType: subType.name })}
+                                className={`relative border-2 rounded-xl p-4 text-center transition-all min-h-[110px] flex flex-col items-center justify-center ${
+                                  isSelected 
+                                    ? 'border-[#8A2BE2] bg-white shadow-lg' 
+                                    : 'border-white bg-white/80 hover:border-cyan-300 hover:shadow-md'
+                                }`}
+                              >
+                                <div className="flex flex-col items-center justify-center w-full">
+                                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-2.5 transition-all ${
+                                    isSelected 
+                                      ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-md' 
+                                      : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                                  }`}>
+                                    <Icon className={`w-7 h-7 transition-colors ${
+                                      isSelected ? 'text-white' : 'text-gray-600'
+                                    }`} />
+                                  </div>
+                                  
+                                  <h4 className={`text-sm font-semibold mb-1 ${
+                                    isSelected ? 'text-[#8A2BE2]' : 'text-gray-900'
+                                  }`}>
+                                    {subType.name}
+                                  </h4>
+                                  
+                                  <p className="text-gray-500 text-xs">{subType.description}</p>
+                                </div>
+                                
+                                {isSelected && (
+                                  <div className="absolute top-2 right-2">
+                                    <div className="w-6 h-6 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-md">
+                                      <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                                    </div>
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Business/Corporate Sub-Type Selection */}
+                    {profileData.organizerType === 'Business/Corporate' && (
+                      <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-blue-50 rounded-xl p-5 border-2 border-indigo-200">
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Briefcase className="w-5 h-5 text-[#8A2BE2]" />
+                            <label className="block text-gray-900 text-sm font-medium">
+                              Business Type <span className="text-red-500">*</span>
+                            </label>
+                          </div>
+                          <p className="text-gray-600 text-xs">What type of business are you?</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            { id: 'tech', name: 'Tech Company', icon: Laptop, description: 'Software & tech' },
+                            { id: 'retail', name: 'Retail Brand', icon: ShoppingBag, description: 'Store & retail' },
+                            { id: 'hospitality', name: 'Hospitality', icon: Plane, description: 'Hotel & travel' },
+                            { id: 'entertainment', name: 'Entertainment', icon: Film, description: 'Media & production' },
+                          ].map((subType) => {
+                            const Icon = subType.icon;
+                            const isSelected = profileData.venueSubType === subType.name;
+                            
+                            return (
+                              <button
+                                key={subType.id}
+                                type="button"
+                                onClick={() => setProfileData({ ...profileData, venueSubType: subType.name })}
+                                className={`relative border-2 rounded-xl p-4 text-center transition-all min-h-[110px] flex flex-col items-center justify-center ${
+                                  isSelected 
+                                    ? 'border-[#8A2BE2] bg-white shadow-lg' 
+                                    : 'border-white bg-white/80 hover:border-indigo-300 hover:shadow-md'
+                                }`}
+                              >
+                                <div className="flex flex-col items-center justify-center w-full">
+                                  <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-2.5 transition-all ${
+                                    isSelected 
+                                      ? 'bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] shadow-md' 
+                                      : 'bg-gradient-to-br from-gray-100 to-gray-200'
+                                  }`}>
+                                    <Icon className={`w-7 h-7 transition-colors ${
+                                      isSelected ? 'text-white' : 'text-gray-600'
+                                    }`} />
+                                  </div>
+                                  
+                                  <h4 className={`text-sm font-semibold mb-1 ${
+                                    isSelected ? 'text-[#8A2BE2]' : 'text-gray-900'
+                                  }`}>
+                                    {subType.name}
+                                  </h4>
+                                  
+                                  <p className="text-gray-500 text-xs">{subType.description}</p>
+                                </div>
+                                
+                                {isSelected && (
+                                  <div className="absolute top-2 right-2">
+                                    <div className="w-6 h-6 bg-gradient-to-br from-[#8A2BE2] to-[#6A1BB2] rounded-full flex items-center justify-center shadow-md">
+                                      <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                                    </div>
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Sports Club/Fitness Provider Sub-Type Selection */}
+                    {profileData.organizerType === 'Sports Club/Fitness' && (
+                      <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 rounded-xl p-5 border-2 border-green-200">
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Trophy className="w-5 h-5 text-[#8A2BE2]" />
+                            <label className="block text-gray-900 text-sm font-medium">
+                              Sports/Fitness Type <span className="text-red-500">*</span>
+                            </label>
+                          </div>
+                          <p className="text-gray-600 text-xs">What type of sports/fitness provider are you?</p>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-3">
+                          {[
+                            { id: 'gym', name: 'Gym/Fitness', icon: Dumbbell, description: 'Gym & fitness' },
+                            { id: 'sports', name: 'Sports Club', icon: Trophy, description: 'Sports team' },
+                            { id: 'yoga', name: 'Yoga/Wellness', icon: Activity, description: 'Yoga & wellness' },
+                            { id: 'martial', name: 'Martial Arts', icon: Target, description: 'Fighting & martial' },
+                          ].map((subType) => {
+                            const Icon = subType.icon;
+                            const isSelected = profileData.venueSubType === subType.name;
+                            
+                            return (
+                              <button
+                                key={subType.id}
+                                type="button"
+                                onClick={() => setProfileData({ ...profileData, venueSubType: subType.name })}
+                                className={`relative border-2 rounded-xl p-4 text-center transition-all min-h-[110px] flex flex-col items-center justify-center ${
+                                  isSelected 
+                                    ? 'border-[#8A2BE2] bg-white shadow-lg' 
+                                    : 'border-white bg-white/80 hover:border-green-300 hover:shadow-md'
                                 }`}
                               >
                                 <div className="flex flex-col items-center justify-center w-full">
