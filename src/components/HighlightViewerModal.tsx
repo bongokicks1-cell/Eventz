@@ -1,4 +1,4 @@
-import { X, Heart, Share2, Volume2, VolumeX } from 'lucide-react';
+import { X, Heart, Share2, Volume2, VolumeX, Play } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { useState, useRef, useEffect } from 'react';
 import { ShareModal } from './ShareModal';
@@ -33,6 +33,7 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
   const [isBuffering, setIsBuffering] = useState(false);
+  const [showPlayButton, setShowPlayButton] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Update progress bar for videos
@@ -48,6 +49,25 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
     video.addEventListener('timeupdate', updateProgress);
     return () => video.removeEventListener('timeupdate', updateProgress);
   }, []);
+
+  // Auto-play video on mount for mobile support
+  useEffect(() => {
+    if (highlight.mediaType === 'video' && videoRef.current) {
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Video playing');
+            setIsBuffering(false);
+          })
+          .catch(err => {
+            console.log('Autoplay prevented on mobile, adding tap handler:', err);
+            setIsPlaying(false);
+            setShowPlayButton(true);
+          });
+      }
+    }
+  }, [highlight]);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
@@ -110,7 +130,11 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
               playsInline
               preload="auto"
               onWaiting={() => setIsBuffering(true)}
-              onPlaying={() => setIsBuffering(false)}
+              onPlaying={() => {
+                setIsBuffering(false);
+                setIsPlaying(true);
+              }}
+              onPause={() => setIsPlaying(false)}
               onCanPlay={() => setIsBuffering(false)}
               className="w-full h-full object-contain"
             />
@@ -126,6 +150,15 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
           {isBuffering && highlight.mediaType === 'video' && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
               <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
+          )}
+
+          {/* Mobile Play Button (when autoplay blocked) */}
+          {!isPlaying && highlight.mediaType === 'video' && !isBuffering && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="bg-white/90 backdrop-blur-sm rounded-full p-6 shadow-2xl">
+                <Play className="w-16 h-16 text-gray-900 fill-gray-900 ml-1" />
+              </div>
             </div>
           )}
         </div>

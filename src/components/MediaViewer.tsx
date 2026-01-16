@@ -79,6 +79,24 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
     };
   }, [currentIndex]);
 
+  // Auto-play video on mobile
+  useEffect(() => {
+    if (type === 'video' && videoRef.current) {
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+            setIsBuffering(false);
+          })
+          .catch(err => {
+            console.log('Autoplay prevented:', err);
+            setIsPlaying(false);
+          });
+      }
+    }
+  }, [currentIndex, type]);
+
   // Auto-hide feedback
   useEffect(() => {
     if (showFeedback) {
@@ -274,8 +292,12 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
               playsInline
               preload="auto"
               onWaiting={() => setIsBuffering(true)}
-              onPlaying={() => setIsBuffering(false)}
+              onPlaying={() => {
+                setIsBuffering(false);
+                setIsPlaying(true);
+              }}
               onCanPlay={() => setIsBuffering(false)}
+              onPause={() => setIsPlaying(false)}
               className="w-full h-full object-contain"
             />
           )}
@@ -295,6 +317,15 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
                 {showFeedback === 'forward' && <RotateCw className="w-12 h-12 text-white" />}
                 {showFeedback === 'play' && <Play className="w-12 h-12 text-white fill-white" />}
                 {showFeedback === 'pause' && <Pause className="w-12 h-12 text-white fill-white" />}
+              </div>
+            </div>
+          )}
+
+          {/* Mobile Play Button (when autoplay blocked) */}
+          {!isPlaying && type === 'video' && !isBuffering && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div className="bg-white/90 backdrop-blur-sm rounded-full p-6 shadow-2xl">
+                <Play className="w-16 h-16 text-gray-900 fill-gray-900 ml-1" />
               </div>
             </div>
           )}

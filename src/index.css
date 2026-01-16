@@ -2834,6 +2834,10 @@
     fill: #ff3cac;
   }
 
+  .fill-gray-900 {
+    fill: var(--color-gray-900);
+  }
+
   .fill-purple-600 {
     fill: var(--color-purple-600);
   }

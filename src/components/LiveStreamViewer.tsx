@@ -52,7 +52,26 @@ export function LiveStreamViewer({ stream, onClose, isUnlockedOverride }: LiveSt
   // Play video when unlocked
   useEffect(() => {
     if (isUnlocked && videoRef.current) {
-      videoRef.current.play().catch(err => console.log('Video autoplay prevented:', err));
+      // Force play on mobile - handle promise properly
+      const playPromise = videoRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Video playing successfully');
+            setIsBuffering(false);
+          })
+          .catch(err => {
+            console.log('Video autoplay prevented, user tap required:', err);
+            // On mobile, we may need user interaction - add click handler
+            const handleFirstPlay = () => {
+              if (videoRef.current) {
+                videoRef.current.play();
+                videoRef.current.removeEventListener('click', handleFirstPlay);
+              }
+            };
+            videoRef.current?.addEventListener('click', handleFirstPlay);
+          });
+      }
     }
   }, [isUnlocked]);
 
