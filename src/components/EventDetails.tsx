@@ -4754,6 +4754,7 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
                           className="w-full h-full object-cover"
                           muted
                           playsInline
+                          preload="metadata"
                         />
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-md group-hover:bg-white transition-colors">

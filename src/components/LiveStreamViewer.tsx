@@ -41,6 +41,7 @@ export function LiveStreamViewer({ stream, onClose, isUnlockedOverride }: LiveSt
   const chatEndRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
 
   useEffect(() => {
     if (chatEndRef.current) {
@@ -157,28 +158,39 @@ export function LiveStreamViewer({ stream, onClose, isUnlockedOverride }: LiveSt
         {/* Video Player Container - iPhone 16 Pro Max optimized */}
         <div className="flex-1 flex items-start justify-center relative pt-14">
           <div className="w-full h-full relative bg-black">
-            {/* Real Video Player (when unlocked) */}
-            {isUnlocked ? (
-              <video
-                ref={videoRef}
-                className="w-full h-full object-contain"
-                loop
-                playsInline
-                muted={isMuted}
-              >
-                <source src={getVideoUrl()} type="video/mp4" />
-              </video>
-            ) : (
+            {/* Real Video Player (ALWAYS RENDERED for instant playback) */}
+            <video
+              ref={videoRef}
+              className={`w-full h-full object-contain transition-opacity duration-300 ${isUnlocked ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+              loop
+              playsInline
+              muted={isMuted}
+              preload="auto"
+              onWaiting={() => setIsBuffering(true)}
+              onPlaying={() => setIsBuffering(false)}
+              onCanPlay={() => setIsBuffering(false)}
+            >
+              <source src={getVideoUrl()} type="video/mp4" />
+            </video>
+
+            {/* Blurred Thumbnail (when locked) */}
+            {!isUnlocked && (
               <>
-                {/* Blurred Thumbnail (when locked) */}
                 <ImageWithFallback
                   src={stream.thumbnail}
                   alt={stream.title}
-                  className="w-full h-full object-cover blur-xl scale-110 transition-all duration-500"
+                  className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 transition-all duration-500"
                 />
                 {/* Dimmed overlay for locked state */}
                 <div className="absolute inset-0 bg-black/60"></div>
               </>
+            )}
+
+            {/* Buffering Indicator */}
+            {isBuffering && isUnlocked && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+                <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+              </div>
             )}
 
             {/* Top overlay - Live indicator, viewers, quality */}
@@ -346,7 +358,7 @@ export function LiveStreamViewer({ stream, onClose, isUnlockedOverride }: LiveSt
           {!showChat && isUnlocked && (
             <button
               onClick={() => setShowChat(true)}
-              className="absolute right-6 bottom-32 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 flex items-center justify-center shadow-2xl transition-all hover:scale-110 z-20"
+              className="absolute right-6 bottom-32 w-14 h-14 rounded-full bg-[#8A2BE2] hover:bg-[#7B24CC] flex items-center justify-center shadow-2xl transition-all hover:scale-110 z-20"
             >
               <MessageCircle className="w-6 h-6 text-white" />
             </button>

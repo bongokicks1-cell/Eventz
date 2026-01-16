@@ -197,6 +197,7 @@
     --radius-3xl: 1.5rem;
     --drop-shadow-lg: 0 4px 4px #00000026;
     --ease-out: cubic-bezier(0, 0, .2, 1);
+    --animate-spin: spin 1s linear infinite;
     --animate-ping: ping 1s cubic-bezier(0, 0, .2, 1) infinite;
     --animate-pulse: pulse 2s cubic-bezier(.4, 0, .6, 1) infinite;
     --animate-bounce: bounce 1s infinite;
@@ -1460,6 +1461,10 @@
     animation: var(--animate-pulse);
   }
 
+  .animate-spin {
+    animation: var(--animate-spin);
+  }
+
   .cursor-not-allowed {
     cursor: not-allowed;
   }
@@ -1898,6 +1903,10 @@
 
   .border-yellow-400 {
     border-color: var(--color-yellow-400);
+  }
+
+  .border-t-white {
+    border-top-color: var(--color-white);
   }
 
   .bg-\[\#8A2BE2\] {
@@ -4025,6 +4034,12 @@
   }
 
   @media (hover: hover) {
+    .hover\:bg-\[\#7B24CC\]:hover {
+      background-color: #7b24cc;
+    }
+  }
+
+  @media (hover: hover) {
     .hover\:bg-\[\#7526c7\]:hover {
       background-color: #7526c7;
     }
@@ -5091,6 +5106,12 @@ html {
 @property --tw-ease {
   syntax: "*";
   inherits: false
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes ping {

@@ -40,6 +40,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
   const [duration, setDuration] = useState(0);
   const [showFeedback, setShowFeedback] = useState<'rewind' | 'forward' | 'play' | 'pause' | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isBuffering, setIsBuffering] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const [showShareModal, setShowShareModal] = useState(false);
@@ -271,8 +272,19 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
               loop
               muted={isMuted}
               playsInline
+              preload="auto"
+              onWaiting={() => setIsBuffering(true)}
+              onPlaying={() => setIsBuffering(false)}
+              onCanPlay={() => setIsBuffering(false)}
               className="w-full h-full object-contain"
             />
+          )}
+
+          {/* Buffering Indicator */}
+          {isBuffering && type === 'video' && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+              <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
           )}
 
           {/* Visual Feedback - Instagram Style */}

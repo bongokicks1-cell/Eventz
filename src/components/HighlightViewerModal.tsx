@@ -32,6 +32,7 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
   const [progress, setProgress] = useState(0);
+  const [isBuffering, setIsBuffering] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Update progress bar for videos
@@ -96,7 +97,7 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
       <div className="relative h-full w-full flex items-center justify-center">
         {/* Media Content - Tap to play/pause */}
         <div 
-          className="w-full h-full"
+          className="w-full h-full relative"
           onClick={() => highlight.mediaType === 'video' && togglePlayPause()}
         >
           {highlight.mediaType === 'video' ? (
@@ -107,6 +108,10 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
               loop
               muted={isMuted}
               playsInline
+              preload="auto"
+              onWaiting={() => setIsBuffering(true)}
+              onPlaying={() => setIsBuffering(false)}
+              onCanPlay={() => setIsBuffering(false)}
               className="w-full h-full object-contain"
             />
           ) : (
@@ -115,6 +120,13 @@ export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: Hi
               alt={highlight.title}
               className="w-full h-full object-contain"
             />
+          )}
+
+          {/* Buffering Indicator */}
+          {isBuffering && highlight.mediaType === 'video' && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/30 pointer-events-none">
+              <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+            </div>
           )}
         </div>
 
