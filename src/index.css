@@ -1477,6 +1477,10 @@
     touch-action: manipulation;
   }
 
+  .touch-none {
+    touch-action: none;
+  }
+
   .resize-none {
     resize: none;
   }

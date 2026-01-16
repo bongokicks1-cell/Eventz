@@ -215,7 +215,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
     }
   };
 
-  // Handle progress bar scrubbing
+  // Handle progress bar scrubbing (MOUSE)
   const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!videoRef.current || type !== 'video') return;
     
@@ -229,6 +229,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
 
   const handleProgressMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     if (type !== 'video') return;
+    e.stopPropagation();
     setIsDragging(true);
     handleProgressClick(e);
   };
@@ -248,13 +249,48 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
     setIsDragging(false);
   };
 
+  // Handle progress bar scrubbing (TOUCH - MOBILE)
+  const handleProgressTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    if (type !== 'video' || !videoRef.current) return;
+    e.stopPropagation();
+    setIsDragging(true);
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = touch.clientX - rect.left;
+    const percentage = x / rect.width;
+    const newTime = percentage * videoRef.current.duration;
+    
+    videoRef.current.currentTime = newTime;
+  };
+
+  const handleProgressTouchMove = (e: TouchEvent) => {
+    if (!isDragging || !videoRef.current || type !== 'video' || !progressBarRef.current) return;
+    
+    const rect = progressBarRef.current.getBoundingClientRect();
+    const touch = e.touches[0];
+    const x = Math.max(0, Math.min(touch.clientX - rect.left, rect.width));
+    const percentage = x / rect.width;
+    const newTime = percentage * videoRef.current.duration;
+    
+    videoRef.current.currentTime = newTime;
+  };
+
+  const handleProgressTouchEnd = () => {
+    setIsDragging(false);
+  };
+
   useEffect(() => {
     if (isDragging) {
       window.addEventListener('mousemove', handleProgressMouseMove);
       window.addEventListener('mouseup', handleProgressMouseUp);
+      window.addEventListener('touchmove', handleProgressTouchMove);
+      window.addEventListener('touchend', handleProgressTouchEnd);
       return () => {
         window.removeEventListener('mousemove', handleProgressMouseMove);
         window.removeEventListener('mouseup', handleProgressMouseUp);
+        window.removeEventListener('touchmove', handleProgressTouchMove);
+        window.removeEventListener('touchend', handleProgressTouchEnd);
       };
     }
   }, [isDragging]);
@@ -406,18 +442,23 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
               {/* Interactive Progress Bar */}
               <div 
                 ref={progressBarRef}
-                className="relative h-1 bg-white/20 rounded-full cursor-pointer group"
+                className="relative h-4 bg-white/20 rounded-full cursor-pointer touch-none"
                 onMouseDown={handleProgressMouseDown}
                 onClick={(e) => e.stopPropagation()}
+                onTouchStart={handleProgressTouchStart}
               >
                 <div 
-                  className="absolute inset-y-0 left-0 bg-[#8A2BE2] rounded-full transition-all"
+                  className="absolute inset-y-0 left-0 bg-[#8A2BE2] rounded-full transition-all pointer-events-none"
                   style={{ width: `${progress}%` }}
                 />
-                {/* Scrubber handle */}
+                {/* Scrubber handle - Larger for mobile */}
                 <div 
-                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{ left: `${progress}%`, transform: 'translate(-50%, -50%)' }}
+                  className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg transition-opacity pointer-events-none"
+                  style={{ 
+                    left: `${progress}%`, 
+                    transform: 'translate(-50%, -50%)',
+                    opacity: isDragging ? 1 : 0.8
+                  }}
                 />
               </div>
 
