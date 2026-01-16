@@ -535,6 +535,10 @@
 }
 
 @layer utilities {
+  .pointer-events-auto {
+    pointer-events: auto;
+  }
+
   .pointer-events-none {
     pointer-events: none;
   }
@@ -741,6 +745,10 @@
 
   .bottom-24 {
     bottom: calc(var(--spacing) * 24);
+  }
+
+  .bottom-32 {
+    bottom: calc(var(--spacing) * 32);
   }
 
   .-left-1 {
@@ -999,10 +1007,6 @@
 
   .ml-2 {
     margin-left: calc(var(--spacing) * 2);
-  }
-
-  .ml-4 {
-    margin-left: calc(var(--spacing) * 4);
   }
 
   .ml-auto {
@@ -2676,11 +2680,6 @@
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
   }
 
-  .to-\[\#FF3CAC\] {
-    --tw-gradient-to: #ff3cac;
-    --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
-  }
-
   .to-amber-50 {
     --tw-gradient-to: var(--color-amber-50);
     --tw-gradient-stops: var(--tw-gradient-via-stops, var(--tw-gradient-position), var(--tw-gradient-from) var(--tw-gradient-from-position), var(--tw-gradient-to) var(--tw-gradient-to-position));
@@ -3513,6 +3512,10 @@
     opacity: .6;
   }
 
+  .opacity-70 {
+    opacity: .7;
+  }
+
   .opacity-100 {
     opacity: 1;
   }
@@ -4136,18 +4139,6 @@
   }
 
   @media (hover: hover) {
-    .hover\:bg-black\/80:hover {
-      background-color: #000c;
-    }
-
-    @supports (color: color-mix(in lab, red, red)) {
-      .hover\:bg-black\/80:hover {
-        background-color: color-mix(in oklab, var(--color-black) 80%, transparent);
-      }
-    }
-  }
-
-  @media (hover: hover) {
     .hover\:bg-cyan-50:hover {
       background-color: var(--color-cyan-50);
     }
@@ -4411,12 +4402,6 @@
   @media (hover: hover) {
     .hover\:text-\[\#7825d4\]:hover {
       color: #7825d4;
-    }
-  }
-
-  @media (hover: hover) {
-    .hover\:text-\[\#FF3CAC\]:hover {
-      color: #ff3cac;
     }
   }
 
@@ -4691,18 +4676,6 @@
   }
 
   @media (width >= 48rem) {
-    .md\:w-2\/5 {
-      width: 40%;
-    }
-  }
-
-  @media (width >= 48rem) {
-    .md\:w-3\/5 {
-      width: 60%;
-    }
-  }
-
-  @media (width >= 48rem) {
     .md\:grid-cols-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -4711,12 +4684,6 @@
   @media (width >= 48rem) {
     .md\:grid-cols-3 {
       grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-  }
-
-  @media (width >= 48rem) {
-    .md\:flex-row {
-      flex-direction: row;
     }
   }
 

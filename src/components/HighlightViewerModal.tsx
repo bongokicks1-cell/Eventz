@@ -1,6 +1,6 @@
-import { X, Heart, MessageCircle, Share2, Send, Clock } from 'lucide-react';
+import { X, Heart, Share2, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ImageWithFallback } from './figma/ImageWithFallback';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ShareModal } from './ShareModal';
 import { handleShare } from '../utils/share';
 import { toast } from 'sonner@2.0.3';
@@ -28,180 +28,197 @@ interface HighlightViewerModalProps {
 export function HighlightViewerModal({ highlight, onClose, onLike, onShare }: HighlightViewerModalProps) {
   const [isLiked, setIsLiked] = useState(highlight.isLiked);
   const [likes, setLikes] = useState(highlight.likes);
-  const [commentText, setCommentText] = useState('');
   const [showShareModal, setShowShareModal] = useState(false);
-
-  const mockComments = [
-    {
-      id: 1,
-      user: 'Sarah Johnson',
-      avatar: 'https://i.pravatar.cc/150?img=1',
-      comment: 'This was amazing! Can\'t wait for the next one! 🔥',
-      timestamp: '1 hour ago'
-    },
-    {
-      id: 2,
-      user: 'Mike Chen',
-      avatar: 'https://i.pravatar.cc/150?img=2',
-      comment: 'Best event ever! The energy was incredible 🎉',
-      timestamp: '2 hours ago'
-    },
-    {
-      id: 3,
-      user: 'Emma Davis',
-      avatar: 'https://i.pravatar.cc/150?img=3',
-      comment: 'Loved every moment of this! When is the next show?',
-      timestamp: '3 hours ago'
-    }
-  ];
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const handleLike = () => {
     setIsLiked(!isLiked);
     setLikes(isLiked ? likes - 1 : likes + 1);
     onLike(highlight.id);
+    
+    // Heart animation feedback
+    if (!isLiked) {
+      toast.success('Added to favorites! ❤️', { duration: 2000 });
+    }
   };
 
-  const handleComment = () => {
-    if (commentText.trim()) {
-      toast.success('Comment posted!');
-      setCommentText('');
+  const togglePlayPause = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const handleShareClick = async () => {
+    const shared = await handleShare({
+      title: highlight.title,
+      text: 'Check out this amazing highlight on EVENTZ!',
+      url: window.location.href,
+    });
+    
+    if (!shared) {
+      setShowShareModal(true);
+    } else {
+      onShare(highlight);
     }
   };
 
   return (
-    <div 
-      className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-      onClick={onClose}
-    >
-      <div 
-        className="bg-white rounded-3xl max-w-5xl w-full max-h-[90vh] overflow-hidden shadow-2xl flex flex-col md:flex-row"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Left Side - Media */}
-        <div className="md:w-3/5 bg-black relative flex items-center justify-center">
-          {highlight.mediaType === 'video' ? (
-            <video
-              src={highlight.video}
-              controls
-              autoPlay
-              className="w-full h-full object-contain"
-              playsInline
-            />
-          ) : (
-            <ImageWithFallback
-              src={highlight.image}
-              alt={highlight.title}
-              className="w-full h-full object-contain"
-            />
-          )}
-          
-          {/* Close Button - Top Left */}
+    <div className="fixed inset-0 bg-black z-[100]">
+      {/* Main Content - Full Screen */}
+      <div className="relative h-full w-full flex items-center justify-center">
+        {/* Media Content */}
+        {highlight.mediaType === 'video' ? (
+          <video
+            ref={videoRef}
+            src={highlight.video}
+            autoPlay
+            loop
+            muted={isMuted}
+            playsInline
+            className="w-full h-full object-contain"
+            onClick={togglePlayPause}
+          />
+        ) : (
+          <ImageWithFallback
+            src={highlight.image}
+            alt={highlight.title}
+            className="w-full h-full object-contain"
+          />
+        )}
+
+        {/* Top Bar - Clean minimal header */}
+        <div className="absolute top-0 left-0 right-0 z-20">
+          <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-b from-black/60 to-transparent">
+            <button
+              onClick={onClose}
+              className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors"
+            >
+              <X className="w-5 h-5 text-white" />
+            </button>
+            
+            <div className="text-center">
+              <p className="text-white text-sm font-medium">Highlight</p>
+              <p className="text-white/70 text-xs">1 / 2</p>
+            </div>
+
+            <div className="w-10 h-10" /> {/* Spacer for centering */}
+          </div>
+        </div>
+
+        {/* Center Controls - Video Only */}
+        {highlight.mediaType === 'video' && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+            <div className="flex items-center gap-6 pointer-events-auto">
+              {/* Previous */}
+              <button className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors">
+                <ChevronLeft className="w-6 h-6 text-white" />
+              </button>
+
+              {/* Play/Pause */}
+              <button
+                onClick={togglePlayPause}
+                className="w-16 h-16 rounded-full bg-white/90 backdrop-blur-md hover:bg-white flex items-center justify-center transition-all shadow-2xl"
+              >
+                {isPlaying ? (
+                  <Pause className="w-7 h-7 text-[#8A2BE2] fill-[#8A2BE2]" />
+                ) : (
+                  <Play className="w-7 h-7 text-[#8A2BE2] fill-[#8A2BE2] ml-1" />
+                )}
+              </button>
+
+              {/* Mute/Unmute */}
+              <button
+                onClick={toggleMute}
+                className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors"
+              >
+                {isMuted ? (
+                  <VolumeX className="w-5 h-5 text-white" />
+                ) : (
+                  <Volume2 className="w-5 h-5 text-white" />
+                )}
+              </button>
+
+              {/* Next */}
+              <button className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors">
+                <ChevronRight className="w-6 h-6 text-white" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Right Side Actions - Minimal vertical stack */}
+        <div className="absolute right-4 bottom-24 flex flex-col gap-4 z-20">
+          {/* Like */}
           <button
-            onClick={onClose}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-black/60 backdrop-blur-sm hover:bg-black/80 flex items-center justify-center transition-colors z-10"
+            onClick={handleLike}
+            className="flex flex-col items-center gap-1 transition-transform hover:scale-110"
           >
-            <X className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors">
+              <Heart
+                className={`w-6 h-6 transition-all ${
+                  isLiked ? 'fill-[#FF3CAC] text-[#FF3CAC]' : 'text-white'
+                }`}
+              />
+            </div>
+            <span className="text-white text-xs font-medium">{likes}</span>
+          </button>
+
+          {/* Share */}
+          <button
+            onClick={handleShareClick}
+            className="flex flex-col items-center gap-1 transition-transform hover:scale-110"
+          >
+            <div className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors">
+              <Share2 className="w-5 h-5 text-white" />
+            </div>
           </button>
         </div>
 
-        {/* Right Side - Details & Comments */}
-        <div className="md:w-2/5 flex flex-col">
-          {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-gray-900 text-xl mb-2 line-clamp-2">{highlight.title}</h2>
-            <div className="flex items-center gap-2 text-gray-500 text-sm">
-              <Clock className="w-4 h-4" />
-              <span>{highlight.timestamp}</span>
-            </div>
+        {/* Bottom Info - Clean minimal */}
+        <div className="absolute bottom-0 left-0 right-0 z-20">
+          <div className="px-4 pb-6 pt-20 bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+            <h3 className="text-white text-lg font-semibold mb-1 line-clamp-2">
+              {highlight.title}
+            </h3>
+            <p className="text-white/80 text-sm line-clamp-2">
+              {highlight.description}
+            </p>
+            <p className="text-white/60 text-xs mt-2">{highlight.timestamp}</p>
           </div>
+        </div>
 
-          {/* Description */}
-          <div className="p-6 border-b border-gray-200">
-            <p className="text-gray-700 leading-relaxed">{highlight.description}</p>
-          </div>
-
-          {/* Stats & Actions */}
-          <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-6">
-                <button
-                  onClick={handleLike}
-                  className={`flex items-center gap-2 transition-colors ${
-                    isLiked ? 'text-[#FF3CAC]' : 'text-gray-600 hover:text-[#FF3CAC]'
-                  }`}
-                >
-                  <Heart className={`w-6 h-6 ${isLiked ? 'fill-[#FF3CAC]' : ''}`} />
-                  <span className="font-medium">{likes}</span>
-                </button>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <MessageCircle className="w-6 h-6" />
-                  <span className="font-medium">{highlight.comments}</span>
-                </div>
-              </div>
-              <button
-                onClick={async () => {
-                  const shared = await handleShare({
-                    title: highlight.title,
-                    text: 'Check out this amazing highlight on EVENTZ!',
-                    url: window.location.href,
-                  });
-                  
-                  // If native share not available, show custom modal
-                  if (!shared) {
-                    setShowShareModal(true);
-                  } else {
-                    onShare(highlight);
-                  }
-                }}
-                className="flex items-center gap-2 text-gray-600 hover:text-[#8A2BE2] transition-colors"
-              >
-                <Share2 className="w-6 h-6" />
-                <span className="font-medium">{highlight.shares}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Comments Section */}
-          <div className="flex-1 overflow-y-auto p-6">
-            <h3 className="text-gray-900 mb-4">Comments</h3>
-            <div className="space-y-4">
-              {mockComments.map((comment) => (
-                <div key={comment.id} className="flex gap-3">
-                  <img
-                    src={comment.avatar}
-                    alt={comment.user}
-                    className="w-10 h-10 rounded-full flex-shrink-0"
-                  />
-                  <div className="flex-1">
-                    <div className="bg-gray-50 rounded-2xl px-4 py-3">
-                      <p className="text-gray-900 text-sm mb-1">{comment.user}</p>
-                      <p className="text-gray-700 text-sm leading-relaxed">{comment.comment}</p>
-                    </div>
-                    <p className="text-gray-400 text-xs mt-1 ml-4">{comment.timestamp}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Comment Input */}
-          <div className="p-6 border-t border-gray-200">
-            <div className="flex items-center gap-3">
-              <input
-                type="text"
-                placeholder="Add a comment..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleComment()}
-                className="flex-1 px-4 py-3 rounded-full border border-gray-300 focus:ring-2 focus:ring-[#8A2BE2] focus:border-transparent outline-none text-gray-900 text-sm"
+        {/* Bottom Thumbnails Preview */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 pb-2 px-4">
+          <div className="flex gap-2 justify-start overflow-x-auto scrollbar-hide">
+            {/* Current highlight */}
+            <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-[#8A2BE2] flex-shrink-0 shadow-lg">
+              <ImageWithFallback
+                src={highlight.image}
+                alt={highlight.title}
+                className="w-full h-full object-cover"
               />
-              <button
-                onClick={handleComment}
-                disabled={!commentText.trim()}
-                className="w-10 h-10 rounded-full bg-gradient-to-r from-[#8A2BE2] to-[#FF3CAC] text-white flex items-center justify-center hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Send className="w-5 h-5" />
-              </button>
+            </div>
+            {/* Next highlight preview */}
+            <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-white/30 flex-shrink-0 opacity-70 hover:opacity-100 transition-opacity cursor-pointer">
+              <ImageWithFallback
+                src={highlight.image}
+                alt="Next"
+                className="w-full h-full object-cover"
+              />
             </div>
           </div>
         </div>

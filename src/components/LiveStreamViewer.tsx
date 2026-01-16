@@ -346,7 +346,7 @@ export function LiveStreamViewer({ stream, onClose, isUnlockedOverride }: LiveSt
           {!showChat && isUnlocked && (
             <button
               onClick={() => setShowChat(true)}
-              className="absolute right-8 bottom-8 w-14 h-14 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center shadow-2xl transition-colors"
+              className="absolute right-6 bottom-32 w-14 h-14 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 flex items-center justify-center shadow-2xl transition-all hover:scale-110 z-20"
             >
               <MessageCircle className="w-6 h-6 text-white" />
             </button>
