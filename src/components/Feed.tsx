@@ -701,24 +701,24 @@ export function Feed({ conversations: globalConversations, onStartConversation, 
   return (
     <>
       {/* Main Feed View */}
-      <div className="min-h-screen bg-[#0E0E11] pb-20">
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white pb-20">
         {/* Unique Header Design */}
-        <div className="bg-[#141417] border-b border-[rgba(255,255,255,0.12)]">
+        <div className="bg-white border-b border-gray-100">
           <div className="px-4 pt-5 pb-4">
             {/* Brand Section */}
             <div className="flex items-center justify-between mb-5">
               <div className="flex items-center gap-3">
-                <h1 className="text-[#F5F5F7] text-xl font-bold">Community</h1>
+                <h1 className="text-gray-900 text-xl font-bold">Community</h1>
                 <span className="px-2.5 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
                   LIVE
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  className="p-2.5 hover:bg-[#1A1A1E] rounded-xl transition-colors relative"
+                  className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors relative"
                   onClick={() => setShowMessages(!showMessages)}
                 >
-                  <MessageSquare className="w-5 h-5 text-[#A1A1A6]" />
+                  <MessageSquare className="w-5 h-5 text-gray-700" />
                   {unreadMessagesCount > 0 && (
                     <span className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] bg-[#8A2BE2] text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1">
                       {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
@@ -726,10 +726,10 @@ export function Feed({ conversations: globalConversations, onStartConversation, 
                   )}
                 </button>
                 <button
-                  className="p-2.5 hover:bg-[#1A1A1E] rounded-xl transition-colors relative"
+                  className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors relative"
                   onClick={() => setShowNotifications(!showNotifications)}
                 >
-                  <Bell className="w-5 h-5 text-[#A1A1A6]" />
+                  <Bell className="w-5 h-5 text-gray-700" />
                   {unreadCount > 0 && (
                     <span className="absolute top-2 right-2 w-2 h-2 bg-pink-500 rounded-full"></span>
                   )}
@@ -743,8 +743,8 @@ export function Feed({ conversations: globalConversations, onStartConversation, 
                 onClick={() => setActiveFilter('all')}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all whitespace-nowrap ${
                   activeFilter === 'all'
-                    ? 'bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white shadow-lg shadow-purple-600/30'
-                    : 'bg-[#1A1A1E] border border-[rgba(255,255,255,0.12)] text-[#A1A1A6] hover:border-[#9D4EDD]/50'
+                    ? 'bg-[#8A2BE2] text-white shadow-lg shadow-purple-200'
+                    : 'bg-white border border-gray-200 text-gray-700 hover:border-purple-300'
                 }`}
               >
                 <LayoutGrid className="w-4 h-4" />
@@ -754,8 +754,8 @@ export function Feed({ conversations: globalConversations, onStartConversation, 
                 onClick={() => setActiveFilter('following')}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all whitespace-nowrap ${
                   activeFilter === 'following'
-                    ? 'bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white shadow-lg shadow-purple-600/30'
-                    : 'bg-[#1A1A1E] border border-[rgba(255,255,255,0.12)] text-[#A1A1A6] hover:border-[#9D4EDD]/50'
+                    ? 'bg-[#8A2BE2] text-white shadow-lg shadow-purple-200'
+                    : 'bg-white border border-gray-200 text-gray-700 hover:border-purple-300'
                 }`}
               >
                 <UsersIcon className="w-4 h-4" />
@@ -792,7 +792,7 @@ export function Feed({ conversations: globalConversations, onStartConversation, 
           {filteredPosts.map((post, index) => (
             <div
               key={post.id}
-              className="bg-[#141417] rounded-2xl shadow-sm border border-[rgba(255,255,255,0.12)] overflow-hidden hover:shadow-lg hover:shadow-black/50 hover:border-[#9D4EDD]/50 transition-all cursor-pointer"
+              className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:border-purple-200 transition-all cursor-pointer"
               onClick={(e) => handleDoubleTap(post, e)}
               style={{ animation: `slideUp 0.4s ease-out ${index * 0.08}s both` }}
             >
@@ -803,13 +803,13 @@ export function Feed({ conversations: globalConversations, onStartConversation, 
                     <img
                       src={post.user.avatar}
                       alt={post.user.name}
-                      className="w-11 h-11 rounded-xl object-cover ring-2 ring-[#9D4EDD]/20 cursor-pointer hover:ring-[#9D4EDD]/50 transition-all"
+                      className="w-11 h-11 rounded-xl object-cover ring-2 ring-purple-100 cursor-pointer hover:ring-purple-300 transition-all"
                       onClick={(e) => handleOpenUserProfile(post.user, e)}
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <span 
-                          className="text-[#F5F5F7] text-sm font-semibold truncate cursor-pointer hover:text-[#9D4EDD] transition-colors"
+                          className="text-gray-900 text-sm font-semibold truncate cursor-pointer hover:text-purple-600 transition-colors"
                           onClick={(e) => handleOpenUserProfile(post.user, e)}
                         >
                           {post.user.name}

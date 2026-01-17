@@ -4617,8 +4617,8 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm animate-in fade-in" onClick={onClose}>
-      <div className="w-full max-w-lg bg-[#141417] rounded-3xl shadow-2xl animate-in slide-in-from-bottom max-h-[95vh] overflow-y-auto border border-[rgba(255,255,255,0.12)]" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in" onClick={onClose}>
+      <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl animate-in slide-in-from-bottom max-h-[95vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
         {/* Cover Image with Overlays */}
         <div className="relative w-full h-96">
           <ImageWithFallback
@@ -4631,9 +4631,9 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
           {event.organizer && (
             <button
               onClick={() => setShowOrganizerProfile(true)}
-              className="absolute top-4 left-4 px-3 py-1.5 bg-[#141417]/90 backdrop-blur-sm rounded-full shadow-lg z-20 hover:bg-[#1A1A1E] transition-all cursor-pointer group border border-[rgba(255,255,255,0.12)]"
+              className="absolute top-4 left-4 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full shadow-lg z-20 hover:bg-white transition-all cursor-pointer group"
             >
-              <p className="text-[#F5F5F7] text-sm group-hover:text-[#9D4EDD] transition-colors">by {event.organizer}</p>
+              <p className="text-gray-900 text-sm group-hover:text-[#8A2BE2] transition-colors">by {event.organizer}</p>
             </button>
           )}
           
@@ -4654,9 +4654,9 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 bg-[#141417]/90 backdrop-blur-sm hover:bg-[#1A1A1E] rounded-full transition-all shadow-lg z-20 border border-[rgba(255,255,255,0.12)]"
+            className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm hover:bg-white rounded-full transition-all shadow-lg z-20"
           >
-            <X className="w-5 h-5 text-[#F5F5F7]" />
+            <X className="w-5 h-5 text-gray-900" />
           </button>
           
           {/* Minimal gradient overlay - poster fully visible */}
@@ -4665,24 +4665,24 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
 
         <div className="px-6 py-6">
           {/* Event Title with Action Buttons - Professional Layout */}
-          <div className="mb-6 pb-4 border-b border-[rgba(255,255,255,0.12)]">
+          <div className="mb-6 pb-4 border-b border-gray-100">
             <div className="flex items-start justify-between gap-4">
-              <h2 className="text-[#F5F5F7] text-lg flex-1">{event.title}</h2>
+              <h2 className="text-gray-900 text-lg flex-1">{event.title}</h2>
               <div className="flex gap-2">
                 <button 
                   onClick={handleToggleSave}
                   className={`p-2 border rounded-lg transition-all ${
                     isSaved 
-                      ? 'bg-[#9D4EDD]/20 border-[#9D4EDD] text-[#9D4EDD]' 
-                      : 'border-[rgba(255,255,255,0.12)] text-[#A1A1A6] hover:bg-[#1A1A1E]'
+                      ? 'bg-purple-50 border-purple-600 text-purple-600' 
+                      : 'border-gray-200 text-gray-700 hover:bg-gray-50'
                   }`}
                   title={isSaved ? 'Unsave event' : 'Save event'}
                 >
-                  <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-[#9D4EDD]' : ''}`} />
+                  <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-purple-600' : ''}`} />
                 </button>
                 <button 
                   onClick={handleShareEvent}
-                  className="p-2 border border-[rgba(255,255,255,0.12)] text-[#A1A1A6] rounded-lg hover:bg-[#1A1A1E] transition-colors"
+                  className="p-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
                   title="Share event"
                 >
                   <Share2 className="w-4 h-4" />
@@ -4695,33 +4695,33 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
           <div className="mb-6 space-y-4">
             {/* Date & Time */}
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#9D4EDD]/20 to-[#7B2EBB]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Calendar className="w-6 h-6 text-[#9D4EDD]" />
+              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Calendar className="w-6 h-6 text-purple-600" />
               </div>
               <div className="flex-1">
-                <p className="text-[#6C6C70] text-sm">Date & Time</p>
-                <p className="text-[#F5F5F7]">{event.date}</p>
-                <p className="text-[#A1A1A6] text-sm">{event.time}</p>
+                <p className="text-gray-600 text-sm">Date & Time</p>
+                <p className="text-gray-900">{event.date}</p>
+                <p className="text-gray-700 text-sm">{event.time}</p>
               </div>
             </div>
 
             {/* Location */}
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-[#10B981]/20 to-[#059669]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                <MapPin className="w-6 h-6 text-[#10B981]" />
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-6 h-6 text-green-600" />
               </div>
               <div className="flex-1">
-                <p className="text-[#6C6C70] text-sm">Location</p>
-                <p className="text-[#F5F5F7]">{event.location}</p>
-                <p className="text-[#A1A1A6] text-sm">{locations.find(l => l.id === event.city)?.name}</p>
+                <p className="text-gray-600 text-sm">Location</p>
+                <p className="text-gray-900">{event.location}</p>
+                <p className="text-gray-700 text-sm">{locations.find(l => l.id === event.city)?.name}</p>
               </div>
             </div>
           </div>
 
           {/* About the Event */}
           <div className="mb-6">
-            <h2 className="text-[#F5F5F7] mb-3">About the Event</h2>
-            <p className="text-[#A1A1A6] leading-relaxed">{event.description}</p>
+            <h2 className="text-gray-900 mb-3">About the Event</h2>
+            <p className="text-gray-700 leading-relaxed">{event.description}</p>
           </div>
 
           {/* Event Photos & Highlights */}
@@ -4826,35 +4826,35 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
 
                 {/* Streaming Quality & Price */}
                 <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="p-4 bg-[#1A1A1E] rounded-xl border border-[#9D4EDD]/30">
+                  <div className="p-4 bg-white rounded-xl border border-purple-200">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#9D4EDD] to-[#7B2EBB] flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
                         <Tv className="w-4 h-4 text-white" />
                       </div>
-                      <span className="text-[#F5F5F7]">Quality</span>
+                      <span className="text-gray-900">Quality</span>
                     </div>
-                    <p className="text-[#9D4EDD]">{event.streaming.quality} Streaming</p>
+                    <p className="text-purple-600">{event.streaming.quality} Streaming</p>
                   </div>
                   
-                  <div className="p-4 bg-[#1A1A1E] rounded-xl border border-[#06D6FF]/30">
+                  <div className="p-4 bg-white rounded-xl border border-cyan-200">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#06D6FF] to-[#0099CC] flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-cyan-600 flex items-center justify-center">
                         <DollarSign className="w-4 h-4 text-white" />
                       </div>
-                      <span className="text-[#F5F5F7]">Virtual Ticket</span>
+                      <span className="text-gray-900">Virtual Ticket</span>
                     </div>
-                    <p className="text-[#06D6FF]">{event.streaming.virtualPrice}</p>
+                    <p className="text-cyan-600">{event.streaming.virtualPrice}</p>
                   </div>
                 </div>
 
                 {/* Streaming Features */}
                 {event.streaming.features && event.streaming.features.length > 0 && (
                   <div className="mb-4">
-                    <h3 className="text-[#F5F5F7] mb-3">Streaming Features</h3>
+                    <h3 className="text-gray-900 mb-3">Streaming Features</h3>
                     <div className="grid grid-cols-2 gap-2">
                       {event.streaming.features.map((feature, idx) => (
-                        <div key={idx} className="flex items-center gap-2 text-[#A1A1A6]">
-                          <CheckCircle2 className="w-4 h-4 text-[#10B981] flex-shrink-0" />
+                        <div key={idx} className="flex items-center gap-2 text-gray-700">
+                          <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
                           <span className="text-sm">{feature}</span>
                         </div>
                       ))}
@@ -4895,8 +4895,8 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
               </div>
             </div>
           ) : (
-            <div className="mb-6 p-5 bg-[#1A1A1E] rounded-xl border border-[rgba(255,255,255,0.12)]">
-              <div className="flex items-center gap-3 text-[#A1A1A6]">
+            <div className="mb-6 p-5 bg-gray-100 rounded-xl border border-gray-200">
+              <div className="flex items-center gap-3 text-gray-600">
                 <Tv className="w-6 h-6" />
                 <div>
                   <p className="text-gray-900">Live streaming not available</p>
@@ -4925,7 +4925,7 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
           </div>
 
           {/* CTAs */}
-          <div className="flex gap-3 sticky bottom-0 bg-[#141417] py-4 border-t border-[rgba(255,255,255,0.12)] backdrop-blur-xl">
+          <div className="flex gap-3 sticky bottom-0 bg-white py-4 border-t border-gray-200">
             {hasTicket(event.id) ? (
               <button className="flex-1 bg-green-500 text-white py-4 rounded-xl flex items-center justify-center gap-2">
                 <CheckCircle2 className="w-5 h-5" />
@@ -5300,20 +5300,20 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
   };
 
   return (
-    <div className="bg-[#0E0E11] min-h-screen">
+    <div className="bg-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Professional Header with Search & Filter */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <h1 className="text-[#F5F5F7] text-2xl"><strong>EVENTZ</strong></h1>
+              <h1 className="text-gray-900 text-2xl"><strong>EVENTZ</strong></h1>
             </div>
             
             <div className="flex items-center gap-3">
               {/* Premium Search Button */}
               <button 
                 onClick={() => setShowSearchModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-[#141417] text-[#F5F5F7] rounded-xl border border-[rgba(255,255,255,0.12)] hover:bg-[#1A1A1E] hover:shadow-lg hover:scale-105 transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-white text-gray-900 rounded-xl border border-gray-200 hover:bg-gray-50 hover:shadow-lg hover:scale-105 transition-all"
               >
                 <Search className="w-5 h-5" />
                 <span className="text-sm">Search</span>
@@ -5322,12 +5322,12 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
               {/* Circular Filter Icon */}
               <button 
                 onClick={() => setShowFilters(true)}
-                className="relative w-11 h-11 bg-[#141417] rounded-full border border-[rgba(255,255,255,0.12)] hover:bg-[#1A1A1E] hover:border-[#9D4EDD]/50 transition-all shadow-sm flex items-center justify-center"
+                className="relative w-11 h-11 bg-white rounded-full border border-gray-200 hover:bg-gray-50 hover:border-purple-300 transition-all shadow-sm flex items-center justify-center"
                 title="Filter events"
               >
-                <Filter className="w-5 h-5 text-[#A1A1A6]" />
+                <Filter className="w-5 h-5 text-gray-700" />
                 {hasActiveFilters && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white text-xs rounded-full flex items-center justify-center shadow-md">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-purple-600 text-white text-xs rounded-full flex items-center justify-center shadow-md">
                     {activeFiltersCount}
                   </span>
                 )}
@@ -5336,19 +5336,19 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
           </div>
           
           {/* Tagline below - clean left-aligned with EVENTZ */}
-          <p className="text-[#A1A1A6] text-sm">Discover amazing events happening around you</p>
+          <p className="text-gray-600 text-sm">Discover amazing events happening around you</p>
         </div>
 
         {/* Active Filters Chips - Only shown when filters are active */}
         {hasActiveFilters && (
           <div className="flex gap-2 mb-4 flex-wrap">
             {selectedLocation !== 'all' && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#9D4EDD]/20 to-[#7B2EBB]/10 text-[#9D4EDD] border border-[#9D4EDD]/30 rounded-lg text-sm backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm">
                 <span>{locations.find(l => l.id === selectedLocation)?.flag}</span>
                 <span>{locations.find(l => l.id === selectedLocation)?.name.split(',')[0]}</span>
                 <button 
                   onClick={() => setSelectedLocation('all')}
-                  className="ml-1 hover:bg-[#9D4EDD]/20 rounded-full p-0.5"
+                  className="ml-1 hover:bg-purple-200 rounded-full p-0.5"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -5356,18 +5356,18 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
             )}
             {/* Only show subcategory if it exists, otherwise show main category */}
             {selectedSubcategory !== '' ? (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#9D4EDD]/20 to-[#7B2EBB]/10 text-[#9D4EDD] border border-[#9D4EDD]/30 rounded-lg text-sm backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm">
                 <span>🔍</span>
                 <span>{selectedSubcategory}</span>
                 <button 
                   onClick={() => setSelectedSubcategory('')}
-                  className="ml-1 hover:bg-[#9D4EDD]/20 rounded-full p-0.5"
+                  className="ml-1 hover:bg-purple-200 rounded-full p-0.5"
                 >
                   <X className="w-3 h-3" />
                 </button>
               </div>
             ) : selectedCategory !== 'all' && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#9D4EDD]/20 to-[#7B2EBB]/10 text-[#9D4EDD] border border-[#9D4EDD]/30 rounded-lg text-sm backdrop-blur-sm">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg text-sm">
                 <span>{categories.find(c => c.id === selectedCategory)?.icon}</span>
                 <span>{categories.find(c => c.id === selectedCategory)?.name}</span>
                 <button 
@@ -5395,7 +5395,7 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
         {selectedCategory !== 'all' && (
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-[#F5F5F7] text-sm">
+              <span className="text-gray-900 text-sm">
                 {categories.find(c => c.id === selectedCategory)?.name} Subcategories:
               </span>
             </div>
@@ -5407,8 +5407,8 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
                     onClick={() => setSelectedSubcategory(selectedSubcategory === subcategory ? '' : subcategory)}
                     className={`flex-shrink-0 px-4 py-2 rounded-full text-sm transition-all ${ 
                       selectedSubcategory === subcategory
-                        ? 'bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white shadow-md shadow-purple-600/30'
-                        : 'bg-[#141417] text-[#A1A1A6] border border-[rgba(255,255,255,0.12)] hover:border-[#9D4EDD]/50 hover:bg-[#1A1A1E]'
+                        ? 'bg-purple-600 text-white shadow-md'
+                        : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300 hover:bg-purple-50'
                     }`}
                   >
                     {subcategory}
@@ -5424,7 +5424,7 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
             <div
               key={event.id}
               onClick={() => setSelectedEvent(event)}
-              className="bg-[#141417] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-black/50 transition-all cursor-pointer border border-[rgba(255,255,255,0.12)] hover:border-[#9D4EDD]/50"
+              className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all cursor-pointer"
             >
               {/* Event Image */}
               <div className="relative w-full h-40 overflow-hidden">
@@ -5454,16 +5454,16 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
 
               {/* Event Info */}
               <div className="p-3">
-                <h3 className="text-[#F5F5F7] mb-2 text-sm line-clamp-2">
+                <h3 className="text-gray-900 mb-2 text-sm line-clamp-2">
                   {event.title}
                 </h3>
                 
-                <div className="flex items-center gap-1.5 mb-1.5 text-[#A1A1A6] text-xs">
+                <div className="flex items-center gap-1.5 mb-1.5 text-gray-600 text-xs">
                   <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="line-clamp-1">{event.date}</span>
                 </div>
                 
-                <div className="flex items-center gap-1.5 text-[#A1A1A6] text-xs">
+                <div className="flex items-center gap-1.5 text-gray-600 text-xs">
                   <MapPin className="w-3.5 h-3.5 flex-shrink-0" />
                   <span className="line-clamp-1">{event.location}</span>
                 </div>
@@ -5475,10 +5475,10 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
         {/* Empty State */}
         {filteredEvents.length === 0 && (
           <div className="text-center py-16">
-            <div className="w-16 h-16 bg-[#1A1A1E] rounded-full flex items-center justify-center mx-auto mb-4">
-              <Calendar className="w-8 h-8 text-[#6C6C70]" />
+            <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Calendar className="w-8 h-8 text-gray-400" />
             </div>
-            <h3 className="text-[#F5F5F7] mb-2">No events found</h3>
+            <h3 className="text-gray-900 mb-2">No events found</h3>
             <p className="text-gray-600 text-sm">Try selecting different filters</p>
           </div>
         )}
@@ -5486,16 +5486,16 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
 
       {/* Filter Panel Sheet */}
       {showFilters && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/70 backdrop-blur-sm animate-in fade-in" onClick={() => setShowFilters(false)}>
-          <div className="w-full max-w-4xl bg-[#141417] rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom border-t border-[rgba(255,255,255,0.12)]" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm animate-in fade-in" onClick={() => setShowFilters(false)}>
+          <div className="w-full max-w-4xl bg-white rounded-t-3xl shadow-2xl animate-in slide-in-from-bottom" onClick={(e) => e.stopPropagation()}>
             {/* Filter Header */}
-            <div className="flex items-center justify-between p-5 border-b border-[rgba(255,255,255,0.12)]">
-              <h2 className="text-[#F5F5F7]">Filter Events</h2>
+            <div className="flex items-center justify-between p-5 border-b border-gray-200">
+              <h2 className="text-gray-900">Filter Events</h2>
               <button 
                 onClick={() => setShowFilters(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-[#1A1A1E] transition-colors"
+                className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
               >
-                <X className="w-5 h-5 text-[#A1A1A6]" />
+                <X className="w-5 h-5 text-gray-600" />
               </button>
             </div>
 
@@ -5503,17 +5503,17 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
             <div className="p-5 max-h-[70vh] overflow-y-auto">
               {/* Location Section */}
               <div className="mb-6">
-                <h3 className="text-[#F5F5F7] text-sm mb-3">Location</h3>
+                <h3 className="text-gray-900 text-sm mb-3">Location</h3>
                 <div className="relative">
                   <input
                     type="text"
                     placeholder="Search locations..."
                     value={locationSearch}
                     onChange={(e) => setLocationSearch(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-[rgba(255,255,255,0.12)] bg-[#1A1A1E] text-[#F5F5F7] placeholder:text-[#6C6C70] focus:border-[#9D4EDD] focus:outline-none"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-purple-600 focus:outline-none"
                   />
                   <div className="absolute top-3 right-3">
-                    <Search className="w-5 h-5 text-[#6C6C70]" />
+                    <Search className="w-5 h-5 text-gray-500" />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 mt-2">
@@ -5523,8 +5523,8 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
                       onClick={() => setSelectedLocation(location.id)}
                       className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm transition-all border ${
                         selectedLocation === location.id
-                          ? 'bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white border-[#9D4EDD] shadow-md shadow-purple-600/30'
-                          : 'bg-[#1A1A1E] text-[#A1A1A6] border-[rgba(255,255,255,0.12)] hover:bg-[#1F1F23] hover:border-[#9D4EDD]/50'
+                          ? 'bg-purple-600 text-white border-purple-600 shadow-md'
+                          : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                       }`}
                     >
                       <span className="text-base">{location.flag}</span>
@@ -5536,7 +5536,7 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
 
               {/* Category Section */}
               <div className="mb-6">
-                <h3 className="text-[#F5F5F7] text-sm mb-3">Categories</h3>
+                <h3 className="text-gray-900 text-sm mb-3">Categories</h3>
                 <div className="grid grid-cols-2 gap-2">
                   {categories.map((category) => (
                     <button
@@ -5544,8 +5544,8 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
                       onClick={() => setSelectedCategory(category.id)}
                       className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm transition-all border ${
                         selectedCategory === category.id
-                          ? 'bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white border-[#9D4EDD] shadow-md shadow-purple-600/30'
-                          : 'bg-[#1A1A1E] text-[#A1A1A6] border-[rgba(255,255,255,0.12)] hover:bg-[#1F1F23] hover:border-[#9D4EDD]/50'
+                          ? 'bg-purple-600 text-white border-purple-600 shadow-md'
+                          : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
                       }`}
                     >
                       <span className="text-base">{category.icon}</span>
@@ -5557,20 +5557,20 @@ export function EventDetails({ onTicketPurchase, purchasedTickets, conversations
             </div>
 
             {/* Filter Footer */}
-            <div className="p-5 border-t border-[rgba(255,255,255,0.12)] flex gap-3">
+            <div className="p-5 border-t border-gray-200 flex gap-3">
               <button 
                 onClick={() => {
                   setSelectedLocation('all');
                   setSelectedCategory('all');
                   setSelectedSubcategory('');
                 }}
-                className="flex-1 py-3 border border-[rgba(255,255,255,0.12)] text-[#A1A1A6] bg-[#1A1A1E] rounded-xl hover:bg-[#1F1F23] hover:border-[#9D4EDD]/50 transition-colors"
+                className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors"
               >
                 Clear All
               </button>
               <button 
                 onClick={() => setShowFilters(false)}
-                className="flex-1 py-3 bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white rounded-xl hover:shadow-lg hover:shadow-purple-600/50 transition-all"
+                className="flex-1 py-3 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors"
               >
                 Show {filteredEvents.length} Events
               </button>

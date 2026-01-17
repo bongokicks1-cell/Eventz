@@ -266,16 +266,15 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0E0E11]">
+    <div className="min-h-screen bg-gray-50">
       <Toaster 
         position="top-center" 
         richColors 
         closeButton
         toastOptions={{
           style: {
-            background: '#1A1A1E',
-            color: '#F5F5F7',
-            border: '1px solid rgba(255, 255, 255, 0.12)',
+            background: 'white',
+            border: '1px solid #e5e7eb',
             borderRadius: '12px',
           },
         }}
@@ -300,13 +299,13 @@ export default function App() {
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-[#141417] border-t border-[rgba(255,255,255,0.12)] shadow-lg backdrop-blur-xl">
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex justify-around items-center h-16">
             <button
               onClick={() => setActiveTab('event')}
               className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
-                activeTab === 'event' ? 'text-[#9D4EDD]' : 'text-[#6C6C70]'
+                activeTab === 'event' ? 'text-purple-600' : 'text-gray-500'
               }`}
             >
               <Calendar className="w-6 h-6" />
@@ -315,7 +314,7 @@ export default function App() {
             <button
               onClick={() => setActiveTab('feed')}
               className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
-                activeTab === 'feed' ? 'text-[#9D4EDD]' : 'text-[#6C6C70]'
+                activeTab === 'feed' ? 'text-purple-600' : 'text-gray-500'
               }`}
             >
               <Rss className="w-6 h-6" />
@@ -324,7 +323,7 @@ export default function App() {
             <button
               onClick={() => setActiveTab('live')}
               className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors relative ${
-                activeTab === 'live' ? 'text-[#9D4EDD]' : 'text-[#6C6C70]'
+                activeTab === 'live' ? 'text-purple-600' : 'text-gray-500'
               }`}
             >
               <Radio className="w-6 h-6" />
@@ -335,7 +334,7 @@ export default function App() {
             <button
               onClick={() => setActiveTab('create')}
               className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
-                activeTab === 'create' ? 'text-[#9D4EDD]' : 'text-[#6C6C70]'
+                activeTab === 'create' ? 'text-purple-600' : 'text-gray-500'
               }`}
             >
               <PlusCircle className="w-6 h-6" />
@@ -344,7 +343,7 @@ export default function App() {
             <button
               onClick={() => setActiveTab('profile')}
               className={`flex flex-col items-center gap-1 px-4 py-2 transition-colors ${
-                activeTab === 'profile' ? 'text-[#9D4EDD]' : 'text-[#6C6C70]'
+                activeTab === 'profile' ? 'text-purple-600' : 'text-gray-500'
               }`}
             >
               <User className="w-6 h-6" />
