@@ -1318,6 +1318,10 @@
     width: 100%;
   }
 
+  .w-px {
+    width: 1px;
+  }
+
   .max-w-2xl {
     max-width: var(--container-2xl);
   }
@@ -3242,6 +3246,10 @@
     color: #8a2be2;
   }
 
+  .text-\[\#25D366\] {
+    color: #25d366;
+  }
+
   .text-\[\#FF3CAC\] {
     color: #ff3cac;
   }
@@ -4337,6 +4345,12 @@
   @media (hover: hover) {
     .hover\:text-\[\#8A2BE2\]:hover {
       color: #8a2be2;
+    }
+  }
+
+  @media (hover: hover) {
+    .hover\:text-\[\#128C7E\]:hover {
+      color: #128c7e;
     }
   }
 
