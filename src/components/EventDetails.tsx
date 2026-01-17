@@ -203,7 +203,7 @@ const events: Event[] = [
         mediaType: 'video',
       },
       {
-        image: 'https://images.unsplash.com/photo-1761474926371-c0e728a1b8bd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsaXZlJTIwY29uY2VydCUyMHBlcmZvcm1lciUyMHN0YWdlfGVufDF8fHx8MTc2NTkwOTc3M3ww&ixlib=rb-4.1.0&q=80&w=1080',
+        image: 'https://i.ibb.co/GQLDDwSp/616124510-3065207627023296-5502080365092613571-n.jpg',
         caption: 'Live Performance Act',
         type: 'performer',
         mediaType: 'image',
@@ -4542,7 +4542,13 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
   // Convert event highlights to format expected by MediaViewer
   const photosForViewer = event.eventHighlights?.filter(h => h.mediaType === 'image').map((highlight, index) => ({
     id: index,
-    url: highlight.image!,
+    url: index === 0 
+      ? 'https://i.ibb.co/fzBwPCFY/612259937-1395222095310762-6719882087849046787-n.jpg'
+      : index === 1
+      ? 'https://i.ibb.co/GQLDDwSp/616124510-3065207627023296-5502080365092613571-n.jpg'
+      : index === 2
+      ? 'https://i.ibb.co/GQLDDwSp/616124510-3065207627023296-5502080365092613571-n.jpg'
+      : highlight.image!,
     likes: Math.floor(Math.random() * 500) + 50,
     eventName: event.title,
   })) || [];
@@ -4764,7 +4770,15 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
                       </>
                     ) : (
                       <ImageWithFallback
-                        src={highlight.image!}
+                        src={
+                          event.eventHighlights!.filter(h => h.mediaType === 'image').indexOf(highlight) === 0 
+                            ? "https://i.ibb.co/fzBwPCFY/612259937-1395222095310762-6719882087849046787-n.jpg"
+                            : event.eventHighlights!.filter(h => h.mediaType === 'image').indexOf(highlight) === 1
+                            ? "https://i.ibb.co/GQLDDwSp/616124510-3065207627023296-5502080365092613571-n.jpg"
+                            : event.eventHighlights!.filter(h => h.mediaType === 'image').indexOf(highlight) === 2
+                            ? "https://i.ibb.co/GQLDDwSp/616124510-3065207627023296-5502080365092613571-n.jpg"
+                            : highlight.image!
+                        }
                         alt={highlight.caption}
                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                       />
