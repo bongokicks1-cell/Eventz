@@ -85,15 +85,15 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
   const getIcon = (type: string) => {
     switch (type) {
       case 'reminder':
-        return <Calendar className="w-5 h-5 text-cyan-500" />;
+        return <Calendar className="w-5 h-5 text-[#06D6FF]" />;
       case 'update':
-        return <Bell className="w-5 h-5 text-purple-500" />;
+        return <Bell className="w-5 h-5 text-[#9D4EDD]" />;
       case 'ticket':
-        return <Ticket className="w-5 h-5 text-blue-500" />;
+        return <Ticket className="w-5 h-5 text-[#06D6FF]" />;
       case 'follower':
-        return <UserPlus className="w-5 h-5 text-green-500" />;
+        return <UserPlus className="w-5 h-5 text-[#10B981]" />;
       default:
-        return <Bell className="w-5 h-5 text-gray-500" />;
+        return <Bell className="w-5 h-5 text-[#6C6C70]" />;
     }
   };
 
@@ -128,25 +128,25 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
     switch (activeFilter) {
       case 'follower':
         return {
-          icon: <UserPlus className="w-16 h-16 text-gray-300 mx-auto mb-4" />,
+          icon: <UserPlus className="w-16 h-16 text-[#6C6C70] mx-auto mb-4" />,
           title: 'No follower notifications',
           message: 'When someone follows you, you\'ll see it here',
         };
       case 'reminder':
         return {
-          icon: <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />,
+          icon: <Calendar className="w-16 h-16 text-[#6C6C70] mx-auto mb-4" />,
           title: 'No reminders',
           message: 'Event reminders will appear here',
         };
       case 'update':
         return {
-          icon: <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />,
+          icon: <Bell className="w-16 h-16 text-[#6C6C70] mx-auto mb-4" />,
           title: 'No updates',
           message: 'Event updates will appear here',
         };
       default:
         return {
-          icon: <Bell className="w-16 h-16 text-gray-300 mx-auto mb-4" />,
+          icon: <Bell className="w-16 h-16 text-[#6C6C70] mx-auto mb-4" />,
           title: 'No notifications yet',
           message: 'We\'ll notify you when something happens',
         };
@@ -162,15 +162,15 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
   };
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-[#0E0E11] min-h-screen">
       <div className="px-6 py-6 max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-gray-900 mb-2">Notifications</h1>
+          <h1 className="text-[#F5F5F7] mb-2">Notifications</h1>
           <div className="flex items-center justify-between">
-            <p className="text-gray-600">Stay updated with your events</p>
+            <p className="text-[#A1A1A6]">Stay updated with your events</p>
             {unreadCount > 0 && (
-              <span className="px-3 py-1 bg-pink-500 text-white rounded-full text-sm">
+              <span className="px-3 py-1 bg-gradient-to-r from-[#FF3CAC] to-[#9D4EDD] text-white rounded-full text-sm shadow-lg">
                 {unreadCount} new
               </span>
             )}
@@ -182,8 +182,8 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
           <button
             className={`px-4 py-2 transition-all duration-200 ${
               activeFilter === 'all' 
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 scale-105' 
-                : 'border border-gray-300 text-gray-700 hover:scale-105'
+                ? 'bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white shadow-lg shadow-purple-600/30 scale-105' 
+                : 'border border-[rgba(255,255,255,0.12)] bg-[#141417] text-[#A1A1A6] hover:scale-105 hover:border-[#9D4EDD]/50'
             } rounded-lg`}
             onClick={() => setActiveFilter('all')}
           >
@@ -192,8 +192,8 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
           <button
             className={`px-4 py-2 transition-all duration-200 ${
               activeFilter === 'follower' 
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 scale-105' 
-                : 'border border-gray-300 text-gray-700 hover:scale-105'
+                ? 'bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white shadow-lg shadow-purple-600/30 scale-105' 
+                : 'border border-[rgba(255,255,255,0.12)] bg-[#141417] text-[#A1A1A6] hover:scale-105 hover:border-[#9D4EDD]/50'
             } rounded-lg`}
             onClick={() => setActiveFilter('follower')}
           >
@@ -202,8 +202,8 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
           <button
             className={`px-4 py-2 transition-all duration-200 ${
               activeFilter === 'reminder' 
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 scale-105' 
-                : 'border border-gray-300 text-gray-700 hover:scale-105'
+                ? 'bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white shadow-lg shadow-purple-600/30 scale-105' 
+                : 'border border-[rgba(255,255,255,0.12)] bg-[#141417] text-[#A1A1A6] hover:scale-105 hover:border-[#9D4EDD]/50'
             } rounded-lg`}
             onClick={() => setActiveFilter('reminder')}
           >
@@ -212,8 +212,8 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
           <button
             className={`px-4 py-2 transition-all duration-200 ${
               activeFilter === 'update' 
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 scale-105' 
-                : 'border border-gray-300 text-gray-700 hover:scale-105'
+                ? 'bg-gradient-to-r from-[#9D4EDD] to-[#7B2EBB] text-white shadow-lg shadow-purple-600/30 scale-105' 
+                : 'border border-[rgba(255,255,255,0.12)] bg-[#141417] text-[#A1A1A6] hover:scale-105 hover:border-[#9D4EDD]/50'
             } rounded-lg`}
             onClick={() => setActiveFilter('update')}
           >
@@ -229,13 +229,13 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
               style={{ animationDelay: `${index * 50}ms` }}
               className={`flex gap-4 p-4 rounded-xl border transition-all cursor-pointer animate-fadeIn ${
                 notification.read
-                  ? 'bg-white border-gray-200 hover:border-gray-300 hover:shadow-md'
-                  : 'bg-purple-50 border-purple-200 hover:border-purple-300 hover:shadow-lg'
+                  ? 'bg-[#141417] border-[rgba(255,255,255,0.12)] hover:border-[rgba(255,255,255,0.18)] hover:shadow-lg hover:shadow-black/50'
+                  : 'bg-gradient-to-br from-[#9D4EDD]/10 to-[#06D6FF]/5 border-[#9D4EDD]/30 hover:border-[#9D4EDD]/50 hover:shadow-lg hover:shadow-purple-600/20'
               }`}
             >
               {/* Image */}
               {notification.image && (
-                <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden">
+                <div className="flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden ring-1 ring-[rgba(255,255,255,0.12)]">
                   <ImageWithFallback
                     src={notification.image}
                     alt=""
@@ -248,24 +248,24 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-start gap-2 mb-1">
                   {getIcon(notification.type)}
-                  <h3 className="text-gray-900 flex-1">{notification.title}</h3>
+                  <h3 className="text-[#F5F5F7] flex-1">{notification.title}</h3>
                   {!notification.read && (
-                    <span className="w-2 h-2 bg-pink-500 rounded-full flex-shrink-0 mt-2"></span>
+                    <span className="w-2 h-2 bg-[#FF3CAC] rounded-full flex-shrink-0 mt-2 animate-pulse"></span>
                   )}
                 </div>
-                <p className="text-gray-700 mb-1 line-clamp-2">{notification.message}</p>
-                <p className="text-gray-500 text-sm">{notification.time}</p>
+                <p className="text-[#A1A1A6] mb-1 line-clamp-2">{notification.message}</p>
+                <p className="text-[#6C6C70] text-sm">{notification.time}</p>
                 {notification.ticketData && (
-                  <div className="mt-3 p-3 bg-gradient-to-br from-purple-50 to-cyan-50 border border-purple-200 rounded-lg">
+                  <div className="mt-3 p-3 bg-gradient-to-br from-[#9D4EDD]/20 to-[#06D6FF]/10 border border-[#9D4EDD]/30 rounded-lg backdrop-blur-sm">
                     <div className="flex items-center gap-2 mb-2">
-                      <Ticket className="w-4 h-4 text-purple-600" />
-                      <p className="text-purple-600">Ticket Details</p>
+                      <Ticket className="w-4 h-4 text-[#9D4EDD]" />
+                      <p className="text-[#9D4EDD] font-medium">Ticket Details</p>
                     </div>
                     <div className="space-y-1 text-sm">
-                      <p className="text-gray-700"><span className="font-medium">Ticket #:</span> {notification.ticketData.ticketNumber}</p>
-                      <p className="text-gray-700"><span className="font-medium">Barcode:</span> {notification.ticketData.barcode}</p>
-                      <div className="mt-2 pt-2 border-t border-purple-200">
-                        <p className="text-xs text-gray-600">✅ This ticket grants you access to watch the live stream</p>
+                      <p className="text-[#A1A1A6]"><span className="font-medium text-[#F5F5F7]">Ticket #:</span> {notification.ticketData.ticketNumber}</p>
+                      <p className="text-[#A1A1A6]"><span className="font-medium text-[#F5F5F7]">Barcode:</span> {notification.ticketData.barcode}</p>
+                      <div className="mt-2 pt-2 border-t border-[#9D4EDD]/20">
+                        <p className="text-xs text-[#6C6C70]">✅ This ticket grants you access to watch the live stream</p>
                       </div>
                     </div>
                   </div>
@@ -279,8 +279,8 @@ export function Notifications({ purchasedTickets }: NotificationsProps) {
         {filteredNotifications.length === 0 && (
           <div className="text-center py-16">
             {emptyState.icon}
-            <h3 className="text-gray-900 mb-2">{emptyState.title}</h3>
-            <p className="text-gray-600">{emptyState.message}</p>
+            <h3 className="text-[#F5F5F7] mb-2">{emptyState.title}</h3>
+            <p className="text-[#A1A1A6]">{emptyState.message}</p>
           </div>
         )}
       </div>
