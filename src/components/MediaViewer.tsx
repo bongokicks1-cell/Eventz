@@ -335,8 +335,10 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
                     allowFullScreen
                     style={{ border: 'none' }}
                   />
-                  {/* Cover YouTube logo in bottom-right corner */}
-                  <div className="absolute bottom-2 right-2 w-16 h-12 bg-black pointer-events-none z-10" />
+                  {/* Cover YouTube logo and account info in bottom-right corner */}
+                  <div className="absolute bottom-0 right-0 w-24 h-16 bg-black pointer-events-none z-10" />
+                  {/* Cover YouTube title and channel name in top-left corner */}
+                  <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-10" />
                 </>
               ) : (
                 <video
