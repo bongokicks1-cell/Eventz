@@ -322,7 +322,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
             <>
               {(currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be') ? (
                 <iframe
-                  src={`${(currentMedia as VideoClip).videoUrl}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&fs=0&iv_load_policy=3&playsinline=1&loop=1`}
+                  src={`${(currentMedia as VideoClip).videoUrl}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&playsinline=1`}
                   className="w-full h-full"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
