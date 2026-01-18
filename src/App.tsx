@@ -320,10 +320,10 @@ export default function App() {
   // Show loading screen while checking auth
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="w-16 h-16 border-4 border-[#8A2BE2]/30 border-t-[#8A2BE2] rounded-full animate-spin mx-auto"></div>
-          <p className="text-gray-400 font-medium">Loading EVENTZ...</p>
+          <p className="text-gray-600 font-medium">Loading EVENTZ...</p>
         </div>
       </div>
     );

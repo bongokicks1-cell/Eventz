@@ -107,21 +107,21 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A0A0A] flex flex-col">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Hero Section */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         {/* Logo & Branding */}
         <div className="text-center mb-8 space-y-4">
           <div className="flex items-center justify-center gap-3 mb-2">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#8A2BE2] via-[#00D1FF] to-[#FF3CAC] blur-xl opacity-60 animate-pulse"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#8A2BE2] via-[#00D1FF] to-[#FF3CAC] blur-xl opacity-40 animate-pulse"></div>
               <Video className="w-12 h-12 text-[#8A2BE2] relative z-10" strokeWidth={2.5} />
             </div>
             <h1 className="text-5xl font-black bg-gradient-to-r from-[#8A2BE2] via-[#00D1FF] to-[#FF3CAC] bg-clip-text text-transparent">
               EVENTZ
             </h1>
           </div>
-          <p className="text-gray-400 text-lg font-medium">
+          <p className="text-gray-600 text-lg font-medium">
             The Netflix of Live Events
           </p>
           <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
@@ -132,15 +132,15 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
         {/* Auth Card */}
         <div className="w-full max-w-md">
-          <div className="bg-[#141414] border border-[#2A2A2A] rounded-2xl p-8 shadow-2xl">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-xl">
             {/* Tab Switcher */}
-            <div className="flex gap-2 mb-8 bg-[#0A0A0A] p-1 rounded-xl">
+            <div className="flex gap-2 mb-8 bg-gray-100 p-1 rounded-xl">
               <button
                 onClick={() => setIsLogin(true)}
                 className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                   isLogin
                     ? 'bg-gradient-to-r from-[#8A2BE2] to-[#00D1FF] text-white shadow-lg shadow-[#8A2BE2]/20'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 Login
@@ -150,7 +150,7 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
                 className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                   !isLogin
                     ? 'bg-gradient-to-r from-[#8A2BE2] to-[#00D1FF] text-white shadow-lg shadow-[#8A2BE2]/20'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
                 Sign Up
@@ -162,15 +162,15 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
               {/* Name Field (Signup Only) */}
               {!isLogin && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-300">Full Name</label>
+                  <label className="text-sm font-medium text-gray-700">Full Name</label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Enter your name"
-                      className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-xl pl-12 pr-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-[#8A2BE2] focus:ring-2 focus:ring-[#8A2BE2]/20 transition-all"
+                      className="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#8A2BE2] focus:ring-2 focus:ring-[#8A2BE2]/20 transition-all"
                       disabled={isLoading}
                     />
                   </div>
@@ -179,15 +179,15 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
               {/* Email Field */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Email</label>
+                <label className="text-sm font-medium text-gray-700">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
-                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-xl pl-12 pr-4 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-[#8A2BE2] focus:ring-2 focus:ring-[#8A2BE2]/20 transition-all"
+                    className="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-4 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#8A2BE2] focus:ring-2 focus:ring-[#8A2BE2]/20 transition-all"
                     disabled={isLoading}
                   />
                 </div>
@@ -195,21 +195,21 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
               {/* Password Field */}
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-300">Password</label>
+                <label className="text-sm font-medium text-gray-700">Password</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder={isLogin ? 'Enter your password' : 'Create a password (6+ characters)'}
-                    className="w-full bg-[#0A0A0A] border border-[#2A2A2A] rounded-xl pl-12 pr-12 py-3.5 text-white placeholder-gray-600 focus:outline-none focus:border-[#8A2BE2] focus:ring-2 focus:ring-[#8A2BE2]/20 transition-all"
+                    className="w-full bg-white border border-gray-300 rounded-xl pl-12 pr-12 py-3.5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#8A2BE2] focus:ring-2 focus:ring-[#8A2BE2]/20 transition-all"
                     disabled={isLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />
