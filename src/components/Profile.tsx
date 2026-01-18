@@ -391,9 +391,10 @@ interface ProfileProps {
   conversations: any[];
   onStartConversation: (user: any) => any;
   onSendMessage: (conversationId: number, messageText: string) => void;
+  onLogout?: () => void;
 }
 
-export function Profile({ conversations, onStartConversation, onSendMessage }: ProfileProps) {
+export function Profile({ conversations, onStartConversation, onSendMessage, onLogout }: ProfileProps) {
   const [activeTab, setActiveTab] = useState<'tickets' | 'events' | 'photos' | 'videos' | 'saved'>('events');
   const [savedEvents, setSavedEvents] = useState<Event[]>([]);
   const [showSavedEventsModal, setShowSavedEventsModal] = useState(false);
@@ -999,6 +1000,7 @@ export function Profile({ conversations, onStartConversation, onSendMessage }: P
       {showSettingsModal && (
         <SettingsModal
           onClose={() => setShowSettingsModal(false)}
+          onLogout={onLogout}
         />
       )}
 

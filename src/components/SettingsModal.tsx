@@ -4,11 +4,12 @@ import { toast } from 'sonner@2.0.3';
 
 interface SettingsModalProps {
   onClose: () => void;
+  onLogout?: () => void;
 }
 
 type SettingsView = 'main' | 'profile' | 'notifications' | 'privacy' | 'help';
 
-export function SettingsModal({ onClose }: SettingsModalProps) {
+export function SettingsModal({ onClose, onLogout }: SettingsModalProps) {
   const [currentView, setCurrentView] = useState<SettingsView>('main');
   
   // Profile state
@@ -59,6 +60,9 @@ export function SettingsModal({ onClose }: SettingsModalProps) {
 
   const handleLogout = () => {
     toast.success('Logged out successfully! 👋');
+    if (onLogout) {
+      onLogout();
+    }
     onClose();
   };
 
