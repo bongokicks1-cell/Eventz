@@ -319,23 +319,35 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
               className="w-full h-full object-contain"
             />
           ) : (
-            <video
-              ref={videoRef}
-              src={(currentMedia as VideoClip).videoUrl}
-              autoPlay
-              loop
-              muted={isMuted}
-              playsInline
-              preload="auto"
-              onWaiting={() => setIsBuffering(true)}
-              onPlaying={() => {
-                setIsBuffering(false);
-                setIsPlaying(true);
-              }}
-              onCanPlay={() => setIsBuffering(false)}
-              onPause={() => setIsPlaying(false)}
-              className="w-full h-full object-contain"
-            />
+            <>
+              {(currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be') ? (
+                <iframe
+                  src={`${(currentMedia as VideoClip).videoUrl}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&fs=0&iv_load_policy=3&playsinline=1&loop=1`}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ border: 'none' }}
+                />
+              ) : (
+                <video
+                  ref={videoRef}
+                  src={(currentMedia as VideoClip).videoUrl}
+                  autoPlay
+                  loop
+                  muted={isMuted}
+                  playsInline
+                  preload="auto"
+                  onWaiting={() => setIsBuffering(true)}
+                  onPlaying={() => {
+                    setIsBuffering(false);
+                    setIsPlaying(true);
+                  }}
+                  onCanPlay={() => setIsBuffering(false)}
+                  onPause={() => setIsPlaying(false)}
+                  className="w-full h-full object-contain"
+                />
+              )}
+            </>
           )}
 
           {/* Buffering Indicator */}
@@ -376,7 +388,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
         </button>
 
         {/* Mute Button - Top Right (videos only) */}
-        {type === 'video' && (
+        {type === 'video' && !((currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be')) && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -437,7 +449,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
           </div>
 
           {/* Video Controls - Bottom Progress Bar */}
-          {type === 'video' && (
+          {type === 'video' && !((currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be')) && (
             <div className="space-y-2">
               {/* Interactive Progress Bar */}
               <div 

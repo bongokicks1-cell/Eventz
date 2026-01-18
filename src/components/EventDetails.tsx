@@ -124,7 +124,7 @@ const events: Event[] = [
     },
     eventHighlights: [
       {
-        video: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+        video: 'https://www.youtube.com/embed/2KPMETbdbOU',
         caption: 'DJ Amani - Live Performance Highlight',
         type: 'performer',
         mediaType: 'video',
@@ -197,7 +197,7 @@ const events: Event[] = [
     },
     eventHighlights: [
       {
-        video: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+        video: 'https://www.youtube.com/embed/2KPMETbdbOU',
         caption: 'Electric Vibes - DJ Set Highlight',
         type: 'preview',
         mediaType: 'video',
@@ -4755,18 +4755,30 @@ function EventDetailModal({ event, onClose, hasTicket, onPurchaseTicket, onPurch
                   >
                     {highlight.mediaType === 'video' ? (
                       <>
-                        <video
-                          src={highlight.video}
-                          className="w-full h-full object-cover"
-                          muted
-                          playsInline
-                          preload="metadata"
-                        />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-md group-hover:bg-white transition-colors">
-                            <Play className="w-3 h-3 text-gray-900 ml-0.5" fill="currentColor" />
-                          </div>
-                        </div>
+                        {highlight.video?.includes('youtube.com') || highlight.video?.includes('youtu.be') ? (
+                          <iframe
+                            src={highlight.video}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            style={{ border: 'none', pointerEvents: 'none' }}
+                          />
+                        ) : (
+                          <>
+                            <video
+                              src={highlight.video}
+                              className="w-full h-full object-cover"
+                              muted
+                              playsInline
+                              preload="metadata"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-8 h-8 rounded-full bg-white/90 flex items-center justify-center shadow-md group-hover:bg-white transition-colors">
+                                <Play className="w-3 h-3 text-gray-900 ml-0.5" fill="currentColor" />
+                              </div>
+                            </div>
+                          </>
+                        )}
                       </>
                     ) : (
                       <ImageWithFallback
