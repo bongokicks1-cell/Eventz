@@ -4,7 +4,6 @@ const RUNTIME_CACHE = 'eventz-runtime';
 // Assets to cache on install
 const STATIC_CACHE_URLS = [
   '/',
-  '/offline.html',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
@@ -91,16 +90,9 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => {
-          return caches.match('/offline.html').then((response) => {
-            if (response) {
-              return response;
-            }
-            return caches.match('/').then((fallback) => {
-              if (fallback) {
-                return fallback;
-              }
-              return new Response('Offline - Please check your connection');
-            });
+          // Network request failed, return offline page if available
+          return caches.match('/').then((response) => {
+            return response || new Response('Offline - Please check your connection');
           });
         });
     })

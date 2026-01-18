@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { EventDetails } from './components/EventDetails';
 import { LiveFeed } from './components/LiveFeed';
 import { Feed } from './components/Feed';
@@ -8,10 +8,10 @@ import { OrganizerProfileSetup } from './components/OrganizerProfileSetup';
 import { OrganizerDashboard } from './components/OrganizerDashboard';
 import { Notifications } from './components/Notifications';
 import { Profile } from './components/Profile';
+import { AuthScreen } from './components/AuthScreen';
 import { Calendar, Radio, PlusCircle, Bell, User, Rss } from 'lucide-react';
 import { Toaster } from 'sonner@2.0.3';
-import { PWAInstallPrompt } from './components/PWAInstallPrompt';
-import { registerServiceWorker } from './utils/registerSW';
+import { supabase } from './utils/supabase/client';
 
 type Tab = 'event' | 'feed' | 'live' | 'create' | 'profile';
 type OrganizerView = 'dashboard' | 'createEvent';
@@ -159,6 +159,12 @@ export default function App() {
   });
   const [organizerView, setOrganizerView] = useState<OrganizerView>('dashboard');
   const [editingEvent, setEditingEvent] = useState<any>(null);
+  
+  // Auth state
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Ticket management state
   const [purchasedTickets, setPurchasedTickets] = useState<PurchasedTicket[]>(() => {
@@ -169,9 +175,49 @@ export default function App() {
   // Global messaging state
   const [conversations, setConversations] = useState<Conversation[]>(initialConversations);
 
+  // Check for existing session on mount
   useEffect(() => {
-    registerServiceWorker();
+    const checkSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Session check error:', error);
+          setIsAuthenticated(false);
+        } else if (session?.access_token) {
+          setAccessToken(session.access_token);
+          setCurrentUser(session.user);
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (err) {
+        console.error('Session check failed:', err);
+        setIsAuthenticated(false);
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+
+    checkSession();
   }, []);
+
+  const handleAuthSuccess = (token: string, user: any) => {
+    setAccessToken(token);
+    setCurrentUser(user);
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      setAccessToken(null);
+      setCurrentUser(null);
+      setIsAuthenticated(false);
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+  };
 
   // Handler to start or continue a conversation
   const handleStartConversation = (user: { name: string; username?: string; avatar: string; verified: boolean; isOrganizer?: boolean }) => {
@@ -271,6 +317,23 @@ export default function App() {
     localStorage.setItem('eventz-purchased-tickets', JSON.stringify(updatedTickets));
   };
 
+  // Show loading screen while checking auth
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-[#0A0A0A] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-16 h-16 border-4 border-[#8A2BE2]/30 border-t-[#8A2BE2] rounded-full animate-spin mx-auto"></div>
+          <p className="text-gray-400 font-medium">Loading EVENTZ...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show auth screen if not authenticated
+  if (!isAuthenticated) {
+    return <AuthScreen onAuthSuccess={handleAuthSuccess} />;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Toaster 
@@ -285,7 +348,6 @@ export default function App() {
           },
         }}
       />
-      <PWAInstallPrompt />
       {/* Main Content */}
       <div className="max-w-7xl mx-auto pb-20">
         {activeTab === 'event' && <EventDetails onTicketPurchase={handleTicketPurchase} purchasedTickets={purchasedTickets} conversations={conversations} onStartConversation={handleStartConversation} onSendMessage={handleSendMessage} />}
