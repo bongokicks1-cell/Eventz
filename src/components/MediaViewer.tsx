@@ -44,6 +44,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [isYoutubeMuted, setIsYoutubeMuted] = useState(true);
 
   const currentMedia = media[currentIndex];
 
@@ -329,7 +330,7 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
               {(currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be') ? (
                 <>
                   <iframe
-                    src={`${(currentMedia as VideoClip).videoUrl}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&loop=1&playlist=${getYouTubeVideoId((currentMedia as VideoClip).videoUrl)}`}
+                    src={`${(currentMedia as VideoClip).videoUrl}?autoplay=1&mute=${isYoutubeMuted ? 1 : 0}&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&loop=1&playlist=${getYouTubeVideoId((currentMedia as VideoClip).videoUrl)}`}
                     className="w-full h-full"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
@@ -400,18 +401,30 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
         </button>
 
         {/* Mute Button - Top Right (videos only) */}
-        {type === 'video' && !((currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be')) && (
+        {type === 'video' && (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              toggleMute();
+              if ((currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be')) {
+                setIsYoutubeMuted(!isYoutubeMuted);
+              } else {
+                toggleMute();
+              }
             }}
             className="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors"
           >
-            {isMuted ? (
-              <VolumeX className="w-5 h-5 text-white" />
+            {((currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be')) ? (
+              isYoutubeMuted ? (
+                <VolumeX className="w-5 h-5 text-white" />
+              ) : (
+                <Volume2 className="w-5 h-5 text-white" />
+              )
             ) : (
-              <Volume2 className="w-5 h-5 text-white" />
+              isMuted ? (
+                <VolumeX className="w-5 h-5 text-white" />
+              ) : (
+                <Volume2 className="w-5 h-5 text-white" />
+              )
             )}
           </button>
         )}
