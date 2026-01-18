@@ -364,7 +364,14 @@ export default function App() {
             <CreateEvent onBack={handleBackToDashboard} event={editingEvent} />
           )
         )}
-        {activeTab === 'profile' && <Profile conversations={conversations} onStartConversation={handleStartConversation} onSendMessage={handleSendMessage} onLogout={handleLogout} />}
+        {activeTab === 'profile' && (
+          <Profile
+            conversations={conversations}
+            onStartConversation={handleStartConversation}
+            onSendMessage={handleSendMessage}
+            onLogout={handleLogout}
+          />
+        )}
       </div>
 
       {/* Bottom Navigation */}

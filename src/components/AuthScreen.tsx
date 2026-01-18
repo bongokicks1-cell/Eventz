@@ -132,7 +132,7 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
 
         {/* Auth Card */}
         <div className="w-full max-w-md">
-          <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-xl">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-2xl">
             {/* Tab Switcher */}
             <div className="flex gap-2 mb-8 bg-gray-100 p-1 rounded-xl">
               <button
@@ -140,7 +140,7 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
                 className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                   isLogin
                     ? 'bg-gradient-to-r from-[#8A2BE2] to-[#00D1FF] text-white shadow-lg shadow-[#8A2BE2]/20'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
                 Login
@@ -150,7 +150,7 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
                 className={`flex-1 py-3 rounded-lg font-semibold transition-all ${
                   !isLogin
                     ? 'bg-gradient-to-r from-[#8A2BE2] to-[#00D1FF] text-white shadow-lg shadow-[#8A2BE2]/20'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-500 hover:text-gray-900'
                 }`}
               >
                 Sign Up
@@ -209,7 +209,7 @@ export function AuthScreen({ onAuthSuccess }: AuthScreenProps) {
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition-colors"
                   >
                     {showPassword ? (
                       <EyeOff className="w-5 h-5" />

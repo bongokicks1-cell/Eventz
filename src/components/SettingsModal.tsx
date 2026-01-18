@@ -4,7 +4,7 @@ import { toast } from 'sonner@2.0.3';
 
 interface SettingsModalProps {
   onClose: () => void;
-  onLogout?: () => void;
+  onLogout: () => Promise<void>;
 }
 
 type SettingsView = 'main' | 'profile' | 'notifications' | 'privacy' | 'help';
@@ -58,12 +58,15 @@ export function SettingsModal({ onClose, onLogout }: SettingsModalProps) {
     setCurrentView('main');
   };
 
-  const handleLogout = () => {
-    toast.success('Logged out successfully! 👋');
-    if (onLogout) {
-      onLogout();
-    }
+  const handleLogout = async () => {
     onClose();
+    try {
+      await onLogout();
+      toast.success('Logged out successfully! 👋');
+    } catch (error) {
+      console.error('Logout error:', error);
+      toast.error('Failed to log out. Please try again.');
+    }
   };
 
   const menuItems = [

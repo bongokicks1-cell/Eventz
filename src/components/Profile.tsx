@@ -391,7 +391,7 @@ interface ProfileProps {
   conversations: any[];
   onStartConversation: (user: any) => any;
   onSendMessage: (conversationId: number, messageText: string) => void;
-  onLogout?: () => void;
+  onLogout: () => Promise<void>;
 }
 
 export function Profile({ conversations, onStartConversation, onSendMessage, onLogout }: ProfileProps) {
