@@ -47,6 +47,12 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
 
   const currentMedia = media[currentIndex];
 
+  // Extract YouTube video ID for loop functionality
+  const getYouTubeVideoId = (url: string) => {
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? match[1] : null;
+  };
+
   useEffect(() => {
     if (type === 'photo') {
       setLikes((currentMedia as Photo).likes);
@@ -321,13 +327,17 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
           ) : (
             <>
               {(currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be') ? (
-                <iframe
-                  src={`${(currentMedia as VideoClip).videoUrl}?autoplay=1&mute=0&controls=1&modestbranding=1&rel=0&playsinline=1`}
-                  className="w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  style={{ border: 'none' }}
-                />
+                <>
+                  <iframe
+                    src={`${(currentMedia as VideoClip).videoUrl}?autoplay=1&mute=0&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&loop=1&playlist=${getYouTubeVideoId((currentMedia as VideoClip).videoUrl)}`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    style={{ border: 'none' }}
+                  />
+                  {/* Cover YouTube logo in bottom-right corner */}
+                  <div className="absolute bottom-2 right-2 w-16 h-12 bg-black pointer-events-none z-10" />
+                </>
               ) : (
                 <video
                   ref={videoRef}
