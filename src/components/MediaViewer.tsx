@@ -44,15 +44,8 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [isYoutubeMuted, setIsYoutubeMuted] = useState(true);
 
   const currentMedia = media[currentIndex];
-
-  // Extract YouTube video ID for loop functionality
-  const getYouTubeVideoId = (url: string) => {
-    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-    return match ? match[1] : null;
-  };
 
   useEffect(() => {
     if (type === 'photo') {
@@ -328,19 +321,13 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
           ) : (
             <>
               {(currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be') ? (
-                <>
-                  <iframe
-                    src={`${(currentMedia as VideoClip).videoUrl}?autoplay=1&mute=${isYoutubeMuted ? 1 : 0}&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&playsinline=1&loop=1&playlist=${getYouTubeVideoId((currentMedia as VideoClip).videoUrl)}`}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    style={{ border: 'none' }}
-                  />
-                  {/* Cover YouTube logo and account info in bottom-right corner */}
-                  <div className="absolute bottom-0 right-0 w-24 h-16 bg-black pointer-events-none z-10" />
-                  {/* Cover YouTube title and channel name in top-left corner */}
-                  <div className="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-10" />
-                </>
+                <iframe
+                  src={`${(currentMedia as VideoClip).videoUrl}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&showinfo=0&fs=0&iv_load_policy=3&playsinline=1&loop=1`}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  style={{ border: 'none' }}
+                />
               ) : (
                 <video
                   ref={videoRef}
@@ -401,30 +388,18 @@ export function MediaViewer({ media, initialIndex, onClose, type }: MediaViewerP
         </button>
 
         {/* Mute Button - Top Right (videos only) */}
-        {type === 'video' && (
+        {type === 'video' && !((currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be')) && (
           <button
             onClick={(e) => {
               e.stopPropagation();
-              if ((currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be')) {
-                setIsYoutubeMuted(!isYoutubeMuted);
-              } else {
-                toggleMute();
-              }
+              toggleMute();
             }}
             className="absolute top-4 right-4 z-30 w-9 h-9 rounded-full bg-black/40 backdrop-blur-md hover:bg-black/60 flex items-center justify-center transition-colors"
           >
-            {((currentMedia as VideoClip).videoUrl.includes('youtube.com') || (currentMedia as VideoClip).videoUrl.includes('youtu.be')) ? (
-              isYoutubeMuted ? (
-                <VolumeX className="w-5 h-5 text-white" />
-              ) : (
-                <Volume2 className="w-5 h-5 text-white" />
-              )
+            {isMuted ? (
+              <VolumeX className="w-5 h-5 text-white" />
             ) : (
-              isMuted ? (
-                <VolumeX className="w-5 h-5 text-white" />
-              ) : (
-                <Volume2 className="w-5 h-5 text-white" />
-              )
+              <Volume2 className="w-5 h-5 text-white" />
             )}
           </button>
         )}
