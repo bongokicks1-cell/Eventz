@@ -4,12 +4,11 @@ import { toast } from 'sonner@2.0.3';
 
 interface SettingsModalProps {
   onClose: () => void;
-  onLogout: () => Promise<void>;
 }
 
 type SettingsView = 'main' | 'profile' | 'notifications' | 'privacy' | 'help';
 
-export function SettingsModal({ onClose, onLogout }: SettingsModalProps) {
+export function SettingsModal({ onClose }: SettingsModalProps) {
   const [currentView, setCurrentView] = useState<SettingsView>('main');
   
   // Profile state
@@ -58,15 +57,9 @@ export function SettingsModal({ onClose, onLogout }: SettingsModalProps) {
     setCurrentView('main');
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
+    toast.success('Logged out successfully! 👋');
     onClose();
-    try {
-      await onLogout();
-      toast.success('Logged out successfully! 👋');
-    } catch (error) {
-      console.error('Logout error:', error);
-      toast.error('Failed to log out. Please try again.');
-    }
   };
 
   const menuItems = [
